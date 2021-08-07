@@ -3,10 +3,7 @@ package com.pastamania.entity;
 import lombok.Data;
 import lombok.Getter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * @author Pasindu Lakmal
@@ -17,7 +14,7 @@ public class Customer extends  CreateModifyBaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long customerId;
+    private Integer customerNo;
 
     private String id;
 
@@ -45,7 +42,7 @@ public class Customer extends  CreateModifyBaseEntity{
 
     private String lastVisit;
 
-    private Integer totalVisits;
+    private String totalVisits;
 
     private String totalSpent;
 
@@ -53,5 +50,10 @@ public class Customer extends  CreateModifyBaseEntity{
 
     private String permanent_deletion_at;
 
+    private String createdAt;
+
+    private String updatedAt;
+
+    private String deletedAt;
 
 }

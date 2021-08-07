@@ -14,7 +14,7 @@ public class Item extends  CreateModifyBaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long itemId;
+    private Long itemNo;
 
     private String id;
 
@@ -32,17 +32,13 @@ public class Item extends  CreateModifyBaseEntity{
 
     private Boolean useProduction;
 
-    @OneToOne(cascade= {CascadeType.PERSIST,CascadeType.MERGE})
-    @JoinColumn(name = "category_id", referencedColumnName = "categoryId")
-    private Category category;
+    private String categoryId;
 
     private String primary_supplier_id;
 
-    @OneToMany(cascade= {CascadeType.PERSIST,CascadeType.MERGE})
-    private Set<Tax> taxIds;
+    private String taxIds;
 
-    @OneToMany(cascade= {CascadeType.PERSIST,CascadeType.MERGE})
-    private Set<Modifier> modifierIds;
+    private String modifierIds;
 
     private String form;
 
@@ -57,6 +53,6 @@ public class Item extends  CreateModifyBaseEntity{
     private String option3_name;
 
     @OneToMany(cascade= {CascadeType.PERSIST,CascadeType.MERGE})
-    private Set<Varient> varients;
+    private Set<ItemVariant> variants;
 
 }

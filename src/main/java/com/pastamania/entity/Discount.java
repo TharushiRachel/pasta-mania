@@ -1,29 +1,31 @@
-package com.pastamania.entity;
-
-import lombok.Data;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
-/**
- * @author Pasindu Lakmal
- */
-@Entity
-@Data
-public class Discount extends CreateModifyBaseEntity{
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String type;
-
-    private String name;
-
-    private Double discountPercent;
-
-    private Boolean restrictedAccess;
-
-}
+//package com.pastamania.entity;
+//
+//import lombok.Data;
+//
+//import javax.persistence.*;
+//import java.util.Set;
+//
+///**
+// * @author Pasindu Lakmal
+// */
+//@Entity
+//@Data
+//public class Discount extends CreateModifyBaseEntity {
+//
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long discountNo;
+//
+//    private String id;
+//
+//    private String type;
+//
+//    private String name;
+//
+//    private Double discountPercent;
+//
+//    private Boolean restrictedAccess;
+//
+//    private String storesIds;
+//
+//}

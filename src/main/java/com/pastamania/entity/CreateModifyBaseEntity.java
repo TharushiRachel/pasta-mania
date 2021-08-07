@@ -8,9 +8,9 @@ import lombok.Data;
 @Data
 public class CreateModifyBaseEntity {
 
-    String createdAt;
+    private String systemCreatedAt;
 
-    String updatedAt;
+    private String systemUpdatedAt;
 
-    String deletedAt;
+    private String systemDeletedAt;
 }

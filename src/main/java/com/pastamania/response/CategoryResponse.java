@@ -1,4 +1,4 @@
-package com.pastamania.Response;
+package com.pastamania.dto.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -9,21 +9,18 @@ import java.util.List;
  * @author Pasindu Lakmal
  */
 @Data
-public class StoreResponse {
+public class CategoryResponse {
 
-    List<Store> stores;
+    List<Category> categories;
 
     @Data
-    public static class Store {
+    public static class Category {
 
         private String id;
 
         private String name;
 
-        private String address;
-
-        @JsonProperty("phone_number")
-        private String phoneNumber;
+        private String color;
 
         @JsonProperty("created_at")
         private String createdAt;

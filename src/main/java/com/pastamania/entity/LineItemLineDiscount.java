@@ -12,22 +12,22 @@ import javax.persistence.Id;
  */
 @Entity
 @Data
-public class ReceiptPayment extends CreateModifyBaseEntity {
+public class LineItemLineDiscount extends CreateModifyBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long receiptPaymentNo;
+    private Long receiptTotalDiscountNo;
 
-    private String paymentTypeId;
+    private String id;
 
-    private String name;
+    private String pricingType;
 
     private String type;
 
-    private String moneyAmount;
+    private String name;
 
-    private String paidAt;
+    private Integer percentage;
 
-    private String paymentDetails;
+    private Double moneyAmount;
 
 }

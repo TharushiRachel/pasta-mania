@@ -2,7 +2,10 @@ package com.pastamania.entity;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
  * @author Pasindu Lakmal
@@ -13,22 +16,18 @@ public class ReceiptTotalDiscount extends CreateModifyBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long variantStoreNo;
+    private Long receiptTotalDiscountNo;
 
-    @ManyToOne
-    @JoinColumn(name="item_variant_id", nullable = false)
-    private ItemVariant itemVariant;
-
-    private String storeId;
+    private String id;
 
     private String pricingType;
 
-    private String price;
+    private String type;
 
-    private Boolean availableForSale;
+    private String name;
 
-    private String optimalStock;
+    private Integer percentage;
 
-    private String low_stock;
+    private Double moneyAmount;
 
 }

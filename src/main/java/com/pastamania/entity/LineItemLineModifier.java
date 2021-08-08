@@ -1,4 +1,4 @@
-package com.pastamania.entity;
+package com.pastamania.entity;//package com.pastamania.entity;
 
 import lombok.Data;
 
@@ -12,20 +12,21 @@ import javax.persistence.Id;
  */
 @Entity
 @Data
-public class ReceiptTotalTax extends CreateModifyBaseEntity {
+public class LineItemLineModifier extends CreateModifyBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long receiptTotalTaxNo;
+    private Long lineItemLineModifierNo;
 
     private String id;
 
-    private String type;
+    private String modifierOptionId;
 
     private String name;
 
-    private Boolean rate;
+    private String option;
 
-    private String moneyAmount;
+    private String price;
 
+    private Double moneyAmount;
 }

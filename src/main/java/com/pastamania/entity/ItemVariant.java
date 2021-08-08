@@ -10,6 +10,7 @@ import java.util.Set;
  */
 @Entity
 @Data
+@Table(name = "item_variant")
 public class ItemVariant extends CreateModifyBaseEntity {
 
     @Id

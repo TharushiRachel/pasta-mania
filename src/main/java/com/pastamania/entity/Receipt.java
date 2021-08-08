@@ -19,19 +19,21 @@ public class Receipt extends CreateModifyBaseEntity {
 
     private String receiptNumber;
 
+    private String note;
+
     private String receiptType;
 
     private String refundFor;
 
-    private String order;
+    private String _order;
 
-    private String created_at;
+    private String createdAt;
 
-    private String receipt_date;
+    private String receiptDate;
 
-    private String updated_at;
+    private String updatedAt;
 
-    private String cancelled_at;
+    private String cancelledAt;
 
     private String source;
 

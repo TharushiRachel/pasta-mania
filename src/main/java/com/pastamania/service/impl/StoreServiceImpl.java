@@ -3,6 +3,7 @@ package com.pastamania.service.impl;
 //import com.pastamania.Response.CategoryResponse;
 
 import com.pastamania.Response.StoreResponse;
+import com.pastamania.component.RestApiClient;
 import com.pastamania.configuration.ConfigProperties;
 import com.pastamania.entity.Store;
 import com.pastamania.repository.StoreRepository;
@@ -37,6 +38,11 @@ public class StoreServiceImpl implements StoreService {
     @Autowired
     private ConfigProperties configProperties;
 
+    @Autowired
+    private com.pastamania.modelmapper.ModelMapper modelMapperLocal;
+
+    @Autowired
+    private RestApiClient restApiClient;
 //    @Override
 //    public void retrieveCategoryAndPersist(Date date) {
 //        TimeZone tz = TimeZone.getTimeZone("UTC");
@@ -102,5 +108,29 @@ public class StoreServiceImpl implements StoreService {
 
     }
 
+    @Override
+    public Integer getAllStoreByToken(String token) {
+        HttpEntity<String> entity = getEntity(token);
+        //newly created
+        ResponseEntity<StoreResponse> createdResponse = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl()+"stores", HttpMethod.GET, entity, StoreResponse.class);
 
+        log.info("get initial store details createdResponse {}",createdResponse);
+
+        List<Store> stores = modelMapperLocal.map(createdResponse.getBody().getStores(),Store.class);
+
+        storeRepository.saveAll(stores);
+
+        log.info("get initial store details stores {}",stores);
+
+        return 0;
+    }
+
+    private HttpEntity<String> getEntity(String token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String requestJson = "{}";
+        HttpEntity<String> entity = new HttpEntity <> (requestJson, headers);
+        return  entity;
+    }
 }

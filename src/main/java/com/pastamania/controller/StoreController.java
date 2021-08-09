@@ -3,7 +3,9 @@ package com.pastamania.controller;
 import com.pastamania.dto.request.StoreCreateRequest;
 import com.pastamania.dto.response.StoreCreateResponse;
 import com.pastamania.dto.wrapper.SingleResponseWrapper;
+import com.pastamania.entity.Store;
 import com.pastamania.modelmapper.ModelMapper;
+import com.pastamania.service.StoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +22,7 @@ public class StoreController {
     @Autowired
     private ModelMapper modelMapper;
 
-    /*@Autowired
+    @Autowired
     private StoreService storeService;
 
     @PostMapping("${app.endpoint.StoreesCreate}")
@@ -33,18 +35,11 @@ public class StoreController {
 
         log.info("storeCreateRequests status {}",status);
 
-        *//*Store Store = modelMapper.map(request,Store.class);
-
-        Store persistedStore = StoreService.save(Store);
-
-        StoreCreateResponse response = modelMapper.map(persistedStore, StoreCreateResponse.class);
-
-        log.info("Store creation start {}",response.getId());*//*
-
         StoreCreateResponse response = new StoreCreateResponse();
+
         response.setStatus(status);
 
         return new ResponseEntity<SingleResponseWrapper<StoreCreateResponse>>(
                 new SingleResponseWrapper<StoreCreateResponse>(response), HttpStatus.CREATED);
-    }*/
+    }
 }

@@ -39,7 +39,7 @@ public class Scheduler
         System.out.println("Current time = " + dateFormat.format(new Date()));
 //        customerService.initialCustomerPersist();
 //        categoryService.initialCategoryPersist();
-          storeService.initialStorePersist();
+          //storeService.initialStorePersist();
       //    discountService.initialStorePersist();
 
         //itemService.initialStorePersist();

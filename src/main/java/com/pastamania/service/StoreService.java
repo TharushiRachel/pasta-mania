@@ -10,4 +10,6 @@ public interface StoreService {
     void retrieveCategoryAndPersist(Date date);
 
     void initialStorePersist();
+
+    Integer getAllStoreByToken(String token);
 }

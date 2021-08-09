@@ -22,6 +22,8 @@ public class StoreResponse {
 
         private String address;
 
+        private String description;
+
         @JsonProperty("phone_number")
         private String phoneNumber;
 

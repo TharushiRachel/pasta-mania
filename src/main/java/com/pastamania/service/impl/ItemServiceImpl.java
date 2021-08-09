@@ -1,6 +1,7 @@
 package com.pastamania.service.impl;
 
 import com.pastamania.Response.ItemResponse;
+import com.pastamania.configuration.ConfigProperties;
 import com.pastamania.entity.Item;
 import com.pastamania.entity.ItemVariant;
 import com.pastamania.entity.VariantStore;
@@ -27,6 +28,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemServiceImpl implements ItemService {
 
+    @Autowired
+    private ConfigProperties configProperties;
 
     @Autowired
     ItemRepository itemRepository;
@@ -36,6 +39,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     VariantStoreRepository variantStoreRepository;
+
+
 
 
     @Override
@@ -50,7 +55,7 @@ public class ItemServiceImpl implements ItemService {
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
         //newly created
-        ResponseEntity<ItemResponse> createdResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/items", HttpMethod.GET, entity, ItemResponse.class);
+        ResponseEntity<ItemResponse> createdResponse = restTemplate.exchange(configProperties.getLoyvers().getBaseUrl()+"items", HttpMethod.GET, entity, ItemResponse.class);
 
         List<Item> items = createdResponse.getBody().getItems().stream().map(item ->
                 modelMapper.map(item, Item.class)).collect(Collectors.toList());

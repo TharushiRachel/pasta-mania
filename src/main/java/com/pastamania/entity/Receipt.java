@@ -23,7 +23,7 @@ public class Receipt extends CreateModifyBaseEntity {
 
     private String refundFor;
 
-    private String order;
+    private String orders;
 
     private String created_at;
 

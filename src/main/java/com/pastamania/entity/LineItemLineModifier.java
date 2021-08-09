@@ -24,7 +24,7 @@ public class LineItemLineModifier extends CreateModifyBaseEntity {
 
     private String name;
 
-    private String option;
+    private String options;
 
     private String price;
 

@@ -1,6 +1,7 @@
 package com.pastamania.scheduler;
 
 import com.pastamania.service.ReceiptService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,6 +13,7 @@ import java.util.Date;
 /**
  * @author Pasindu Lakmal
  */
+@Slf4j
 @Component
 @EnableScheduling
 public class Scheduler {
@@ -37,7 +39,7 @@ public class Scheduler {
 
     @Scheduled(cron = "*/5 * * * * *")
     public void reportCurrentTime() {
-        System.out.println("Current time = " + dateFormat.format(new Date()));
+        log.info("Current time = " + dateFormat.format(new Date()));
 
         //customerService.initialCustomerPersist();
         //categoryService.initialCategoryPersist();
@@ -45,6 +47,8 @@ public class Scheduler {
         //discountService.initialStorePersist();
         //itemService.initialStorePersist();
         //receiptService.initialPersist();
+
+        receiptService.initialPersist();
 
     }
 }

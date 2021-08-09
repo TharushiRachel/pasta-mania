@@ -1,5 +1,6 @@
 package com.pastamania.service.impl;
 
+import com.pastamania.dto.response.ReceiptResponse;
 import com.pastamania.entity.*;
 import com.pastamania.repository.*;
 import com.pastamania.service.ReceiptService;
@@ -62,7 +63,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
         //newly created
-        ResponseEntity<com.pastamania.dto.Response.ReceiptResponse> createdResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/receipts", HttpMethod.GET, entity, com.pastamania.dto.Response.ReceiptResponse.class);
+        ResponseEntity<ReceiptResponse> createdResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/receipts", HttpMethod.GET, entity, ReceiptResponse.class);
 
         createdResponse.getBody().getReceipts().forEach(receipt -> {
             Receipt receipt1 = modelMapper.map(receipt, Receipt.class);

@@ -3,8 +3,8 @@ package com.pastamania.controller;
 import com.pastamania.dto.request.StoreCreateRequest;
 import com.pastamania.dto.response.StoreCreateResponse;
 import com.pastamania.dto.wrapper.SingleResponseWrapper;
-import com.pastamania.entity.Store;
 import com.pastamania.modelmapper.ModelMapper;
+import com.pastamania.service.CategoryService;
 import com.pastamania.service.StoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,27 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-public class StoreController {
+public class CategoryController {
 
     @Autowired
     private ModelMapper modelMapper;
 
     @Autowired
-    private StoreService storeService;
+    private CategoryService categoryService;
 
-    @PostMapping("${app.endpoint.storesCreate}")
-    public ResponseEntity<SingleResponseWrapper<StoreCreateResponse>> create(
-            @Validated @RequestBody StoreCreateRequest request) {
+    @PostMapping("${app.endpoint.categoriesCreate}")
+    public ResponseEntity<SingleResponseWrapper<StoreCreateResponse>> create() {
+        log.info("categoriesCreate start ");
 
-        log.info("Store creation start {}",request.getToken());
-
-        Integer status = storeService.getAllStoreByToken(request.getToken());
-
-        log.info("storeCreateRequests status {}",status);
+        categoryService.initialCategoryPersist();
 
         StoreCreateResponse response = new StoreCreateResponse();
 
-        response.setStatus(status);
+        response.setStatus(0);
 
         return new ResponseEntity<SingleResponseWrapper<StoreCreateResponse>>(
                 new SingleResponseWrapper<StoreCreateResponse>(response), HttpStatus.CREATED);

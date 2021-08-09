@@ -1,10 +1,8 @@
 package com.pastamania.service.impl;
 
-//import com.pastamania.Response.CategoryResponse;
-
-import com.pastamania.Response.StoreResponse;
 import com.pastamania.component.RestApiClient;
 import com.pastamania.configuration.ConfigProperties;
+import com.pastamania.dto.response.StoreResponse;
 import com.pastamania.entity.Store;
 import com.pastamania.repository.StoreRepository;
 import com.pastamania.service.StoreService;

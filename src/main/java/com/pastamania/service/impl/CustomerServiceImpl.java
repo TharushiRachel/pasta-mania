@@ -4,10 +4,14 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.pastamania.component.RestApiClient;
+import com.pastamania.configuration.ConfigProperties;
 import com.pastamania.dto.CustomerDto;
+import com.pastamania.dto.response.CustomerResponse;
 import com.pastamania.entity.Customer;
 import com.pastamania.repository.CustomerRepository;
 import com.pastamania.service.CustomerService;
+import com.pastamania.util.AuthUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,15 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     CustomerRepository customerRepository;
 
+    @Autowired
+    private RestApiClient restApiClient;
+
+    @Autowired
+    private ConfigProperties configProperties;
+
+    @Autowired
+    private com.pastamania.modelmapper.ModelMapper modelMapperLocal;
+
     @Override
     public void retrieveCustomersAndPersist(Date date) {
         TimeZone tz = TimeZone.getTimeZone("UTC");
@@ -58,14 +71,14 @@ public class CustomerServiceImpl implements CustomerService {
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
         //newly created
-        ResponseEntity<com.pastamania.dto.Response.CustomerResponse> createdResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/customers?created_at_min=" + latestCreatedCustomer.getCreatedAt() + "&created_at_max=" + nowAsISO + "", HttpMethod.GET, entity, com.pastamania.dto.Response.CustomerResponse.class);
+        ResponseEntity<CustomerResponse> createdResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/customers?created_at_min=" + latestCreatedCustomer.getCreatedAt() + "&created_at_max=" + nowAsISO + "", HttpMethod.GET, entity, CustomerResponse.class);
         List<Customer> createdCustomers = createdResponse.getBody().getCustomers().stream().map(customer ->
                 modelMapper.map(customer, Customer.class)).collect(Collectors.toList());
 
         customerRepository.saveAll(createdCustomers);
 
         //newly updated
-        ResponseEntity<com.pastamania.dto.Response.CustomerResponse> updatedResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/customers?updated_at_min=" + lastUpdatedCustomer.getUpdatedAt() + "&updated_at_max=" + nowAsISO + "", HttpMethod.GET, entity, com.pastamania.dto.Response.CustomerResponse.class);
+        ResponseEntity<CustomerResponse> updatedResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/customers?updated_at_min=" + lastUpdatedCustomer.getUpdatedAt() + "&updated_at_max=" + nowAsISO + "", HttpMethod.GET, entity, CustomerResponse.class);
         List<Customer> updatedCustomers = updatedResponse.getBody().getCustomers().stream().map(customer ->
                 modelMapper.map(customer, Customer.class)).collect(Collectors.toList());
 
@@ -76,18 +89,20 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void initialCustomerPersist() {
 
-        RestTemplate restTemplate = new RestTemplate();
+        /*RestTemplate restTemplate = new RestTemplate();
         ModelMapper modelMapper = new ModelMapper();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + "d22e68278c144eb8b22c50a2623bccc9");
         headers.setContentType(MediaType.APPLICATION_JSON);
         String requestJson = "{}";
-        HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+        HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);*/
 
         //newly created
-        ResponseEntity<com.pastamania.dto.Response.CustomerResponse> createdResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/customers", HttpMethod.GET, entity, com.pastamania.dto.Response.CustomerResponse.class);
-        List<Customer> createdCustomers = createdResponse.getBody().getCustomers().stream().map(customer ->
-                modelMapper.map(customer, Customer.class)).collect(Collectors.toList());
+        ResponseEntity<CustomerResponse> createdResponse = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl()+"customers", HttpMethod.GET, AuthUtil.getEntity("d22e68278c144eb8b22c50a2623bccc9"), CustomerResponse.class);
+        /*List<Customer> createdCustomers = createdResponse.getBody().getCustomers().stream().map(customer ->
+                modelMapper.map(customer, Customer.class)).collect(Collectors.toList());*/
+
+        List<Customer> createdCustomers = modelMapperLocal.map(createdResponse.getBody().getCustomers(),Customer.class);
 
         customerRepository.saveAll(createdCustomers);
 

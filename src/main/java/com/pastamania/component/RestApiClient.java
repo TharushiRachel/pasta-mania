@@ -2,6 +2,7 @@ package com.pastamania.component;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,6 +15,9 @@ public class RestApiClient {
 
     private RestTemplate restTemplate;
 
+    @Autowired
+    private TokenAuthorizationInterceptor tokenAuthorizationInterceptor;
+
 
     @Autowired
     private RestTemplateBuilder restTemplateBuilder;
@@ -23,7 +27,7 @@ public class RestApiClient {
     @PostConstruct
     private void postConstruct() {
         this.restTemplate = new RestTemplate();
-
+        this.restTemplateWithAuth = this.restTemplateBuilder.additionalInterceptors(new ClientHttpRequestInterceptor[]{this.tokenAuthorizationInterceptor}).build();
     }
 
     public RestTemplate getRestTemplate() {

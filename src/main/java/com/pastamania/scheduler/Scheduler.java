@@ -38,13 +38,12 @@ public class Scheduler {
     @Scheduled(cron = "*/5 * * * * *")
     public void reportCurrentTime() {
         System.out.println("Current time = " + dateFormat.format(new Date()));
-//        customerService.initialCustomerPersist();
-//        categoryService.initialCategoryPersist();
-//          storeService.initialStorePersist();
-        //    discountService.initialStorePersist();
 
-        //   itemService.initialStorePersist();
-
+        //customerService.initialCustomerPersist();
+        //categoryService.initialCategoryPersist();
+        //storeService.initialStorePersist();
+        //discountService.initialStorePersist();
+        //itemService.initialStorePersist();
         //receiptService.initialPersist();
 
     }

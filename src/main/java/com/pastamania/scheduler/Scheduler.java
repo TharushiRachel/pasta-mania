@@ -1,6 +1,6 @@
 package com.pastamania.scheduler;
 
-import com.pastamania.service.*;
+import com.pastamania.service.ReceiptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,8 +14,7 @@ import java.util.Date;
  */
 @Component
 @EnableScheduling
-public class Scheduler
-{
+public class Scheduler {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
 //    @Autowired
@@ -25,23 +24,28 @@ public class Scheduler
 //    CategoryService categoryService;
 //
 //    @Autowired
+//    StoreService storeService;
+//
+//    @Autowired
 //    DiscountService discountService;
+//
+//    @Autowired
+//    ItemService itemService;
 
     @Autowired
-    StoreService storeService;
-
-    @Autowired
-    ItemService itemService;
+    ReceiptService receiptService;
 
     @Scheduled(cron = "*/5 * * * * *")
-    public void reportCurrentTime()
-    {
+    public void reportCurrentTime() {
         System.out.println("Current time = " + dateFormat.format(new Date()));
 //        customerService.initialCustomerPersist();
 //        categoryService.initialCategoryPersist();
-          //storeService.initialStorePersist();
-      //    discountService.initialStorePersist();
+//          storeService.initialStorePersist();
+        //    discountService.initialStorePersist();
 
-        //itemService.initialStorePersist();
+        //   itemService.initialStorePersist();
+
+        //receiptService.initialPersist();
+
     }
 }

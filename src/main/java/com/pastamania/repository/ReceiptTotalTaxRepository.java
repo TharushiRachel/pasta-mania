@@ -1,0 +1,14 @@
+package com.pastamania.repository;
+
+import com.pastamania.entity.Item;
+import com.pastamania.entity.Receipt;
+import com.pastamania.entity.ReceiptTotalTax;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * @author Pasindu Lakmal
+ */
+public interface ReceiptTotalTaxRepository extends JpaRepository<ReceiptTotalTax,Long> {
+
+
+}

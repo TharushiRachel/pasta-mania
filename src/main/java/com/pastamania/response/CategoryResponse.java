@@ -1,4 +1,4 @@
-package com.pastamania.Response;
+package com.pastamania.dto.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -9,26 +9,18 @@ import java.util.List;
  * @author Pasindu Lakmal
  */
 @Data
-public class DiscountResponse {
+public class CategoryResponse {
 
-    List<Discount> discounts;
+    List<Category> categories;
 
     @Data
-    public static class Discount {
+    public static class Category {
 
         private String id;
 
-        private String type;
-
         private String name;
 
-        private List<String> stores;
-
-        @JsonProperty("discount_percent")
-        private Double discountPercent;
-
-        @JsonProperty("restricted_access")
-        private Boolean restrictedAccess;
+        private String color;
 
         @JsonProperty("created_at")
         private String createdAt;

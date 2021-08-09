@@ -1,4 +1,4 @@
-package com.pastamania.Response;
+package com.pastamania.dto.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

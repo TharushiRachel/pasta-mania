@@ -10,6 +10,7 @@ import java.util.Set;
  */
 @Entity
 @Data
+@Table(name = "receipt_line_item")
 public class ReceiptLineItem extends CreateModifyBaseEntity {
 
     @Id
@@ -18,11 +19,11 @@ public class ReceiptLineItem extends CreateModifyBaseEntity {
 
     private String id;
 
-    private String item_id;
+    private String itemId;
 
-    private String variant_id;
+    private String variantId;
 
-    private Boolean variant_name;
+    private String variantName;
 
     private String sku;
 
@@ -38,9 +39,13 @@ public class ReceiptLineItem extends CreateModifyBaseEntity {
 
     private Double costTotal;
 
-    private String line_note;
+    private String lineNote;
 
     private Double totalDiscount;
+
+    @ManyToOne
+    @JoinColumn(name = "receipt_id", nullable = false)
+    private Receipt receipt;
 
     @OneToMany(cascade= {CascadeType.PERSIST,CascadeType.MERGE})
     private Set<LineItemLineDiscount> lineDiscounts;

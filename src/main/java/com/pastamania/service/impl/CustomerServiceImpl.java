@@ -19,12 +19,21 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -108,108 +117,105 @@ public class CustomerServiceImpl implements CustomerService {
 
     }
 
+//    @Override
+//    public ByteArrayInputStream generateCustomerReportPDF() {
+//
+//        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+//            CustomerDto result = viewCustomer();
+//
+//            Document document = new Document();
+//            PdfWriter.getInstance(document, outputStream);
+//            document.open();
+//
+//            Font headerFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 16, BaseColor.BLACK);
+//            Font bodyLabelFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 12, BaseColor.BLACK);
+//            Font bodyMainFont = FontFactory.getFont(FontFactory.COURIER, 12, BaseColor.BLACK);
+//
+//            //set header
+//            Paragraph headerElement = new Paragraph(" CUSTOMER REPORT", headerFont);
+//            headerElement.setAlignment(Paragraph.ALIGN_CENTER);
+//            document.add(headerElement);
+//
+//            //set main details
+//            if (result.getCustomers().isEmpty()) {
+//                throw new Exception("Customer Report PDF Customers not found.");
+//            } else {
+//                document.add(new Paragraph("" + result.getCompanyName(), bodyMainFont));
+//                document.add(new Paragraph("", bodyLabelFont));
+//                document.add(new Paragraph("" + result.getHeaderName(), bodyMainFont));
+//                document.add(new Paragraph("DATE              : " + LocalDate.now(), bodyMainFont));
+//                document.add(new Paragraph("Brand      : " + result.getBrand(), bodyMainFont));
+//
+//                document.add(new Paragraph(" ", bodyMainFont));
+//            }
+//
+//            PdfPTable table = new PdfPTable(8);
+//            table.setWidthPercentage(100);
+//            Phrase defaultPhrase = new Phrase();
+//            defaultPhrase.setFont(bodyMainFont);
+//            table.getDefaultCell().setPhrase(defaultPhrase);
+//            addSalesReportTableHeader(table, bodyMainFont);
+//            addSalesReportTableRows(table, result, bodyMainFont);
+//            document.add(table);
+//
+//            document.add(new Paragraph(" ", bodyMainFont));
+//            document.add(new Paragraph(" ", bodyMainFont));
+//
+//
+//            document.close();
+//            return new ByteArrayInputStream(outputStream.toByteArray());
+//        } catch (Exception e) {
+//            log.error("Sales report pdf generation error", e);
+//        }
+//
+//        return null;
+//    }
+
     @Override
-    public ByteArrayInputStream generateCustomerReportPDF() {
+    public String parseThymeleafTemplate() {
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+         Integer totalTotalVisits = 0;
+         Double totalPointBalance=0.0;
+         Double totalTotalSpent=0.0;
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
 
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            CustomerDto result = viewCustomer();
-
-            Document document = new Document();
-            PdfWriter.getInstance(document, outputStream);
-            document.open();
-
-            Font headerFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 16, BaseColor.BLACK);
-            Font bodyLabelFont = FontFactory.getFont(FontFactory.COURIER_BOLD, 12, BaseColor.BLACK);
-            Font bodyMainFont = FontFactory.getFont(FontFactory.COURIER, 12, BaseColor.BLACK);
-
-            //set header
-            Paragraph headerElement = new Paragraph(" CUSTOMER REPORT", headerFont);
-            headerElement.setAlignment(Paragraph.ALIGN_CENTER);
-            document.add(headerElement);
-
-            //set main details
-            if (result.getCustomers().isEmpty()) {
-                throw new Exception("Customer Report PDF Customers not found.");
-            } else {
-                document.add(new Paragraph("" + result.getCompanyName(), bodyMainFont));
-                document.add(new Paragraph("", bodyLabelFont));
-                document.add(new Paragraph("" + result.getHeaderName(), bodyMainFont));
-                document.add(new Paragraph("DATE              : " + LocalDate.now(), bodyMainFont));
-                document.add(new Paragraph("Brand      : " + result.getBrand(), bodyMainFont));
-
-                document.add(new Paragraph(" ", bodyMainFont));
-            }
-
-            PdfPTable table = new PdfPTable(8);
-            table.setWidthPercentage(100);
-            Phrase defaultPhrase = new Phrase();
-            defaultPhrase.setFont(bodyMainFont);
-            table.getDefaultCell().setPhrase(defaultPhrase);
-            addSalesReportTableHeader(table, bodyMainFont);
-            addSalesReportTableRows(table, result, bodyMainFont);
-            document.add(table);
-
-            document.add(new Paragraph(" ", bodyMainFont));
-            document.add(new Paragraph(" ", bodyMainFont));
-
-
-            document.close();
-            return new ByteArrayInputStream(outputStream.toByteArray());
-        } catch (Exception e) {
-            log.error("Sales report pdf generation error", e);
-        }
-
-        return null;
-    }
-
-    CustomerDto viewCustomer() {
+        Context context = new Context();;
         CustomerDto customerDto = new CustomerDto();
-        customerDto.setCustomers(customerRepository.findAll());
+        List<CustomerDto.Customer> customers = modelMapperLocal.map(customerRepository.findAll(), CustomerDto.Customer.class);
+        for (CustomerDto.Customer customer : customers) {
+            try {
+                customer.setFirstVisit(convertToNewFormat(customer.getFirstVisit()));
+                customer.setLastVisit(convertToNewFormat(customer.getLastVisit()));
 
-        return customerDto;
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            totalTotalVisits += Integer.parseInt(customer.getTotalVisits());
+            totalPointBalance += Double.parseDouble(customer.getTotal_points()==null?"0":customer.getTotal_points());
+            totalTotalSpent += Double.parseDouble(customer.getTotalSpent());
+
+        }
+        customerDto.setCustomers(customers);
+        context.setVariable("customerList",customerDto.getCustomers());
+        context.setVariable("totalTotalVisits",totalTotalVisits.toString());
+        context.setVariable("totalPointBalance",totalPointBalance.toString());
+        context.setVariable("totalTotalSpent",totalTotalSpent.toString());
+
+        return templateEngine.process("thymeleaf_template", context);
     }
 
-
-    private void addSalesReportTableHeader(PdfPTable table, Font bodyMainFont) throws DocumentException {
-        Stream.of("Customer Name", "Email", "Phone", "First Visit", "Last Visit", "Total Visits", "Points balance", "Total spent")
-                .forEach(columnTitle -> {
-                    PdfPCell header = new PdfPCell();
-                    header.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                    header.setBorderWidth(2);
-                    header.setPhrase(new Phrase(columnTitle, bodyMainFont));
-                    header.setNoWrap(false);
-                    table.addCell(header);
-                });
-        table.setHorizontalAlignment(Element.ALIGN_LEFT);
-        table.setWidths(new float[]{7, 7, 8, 8, 8, 10, 8, 8});
+    public static String convertToNewFormat(String dateStr) throws ParseException {
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        SimpleDateFormat destFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        sourceFormat.setTimeZone(utc);
+        Date convertedDate = sourceFormat.parse(dateStr);
+        return destFormat.format(convertedDate);
     }
 
-    private void addSalesReportTableRows(PdfPTable table, CustomerDto result, Font bodyMainFont) {
-        Phrase phrase = new Phrase();
-        phrase.setFont(bodyMainFont);
-        result.getCustomers().forEach(customer -> {
-
-            table.addCell(new Phrase(customer.getName(), bodyMainFont));
-            table.addCell(new Phrase(customer.getEmail(), bodyMainFont));
-            table.addCell(new Phrase(customer.getPhoneNumber(), bodyMainFont));
-            table.addCell(new Phrase(customer.getFirstVisit(), bodyMainFont));
-            table.addCell(new Phrase(customer.getLastVisit(), bodyMainFont));
-            table.addCell(new Phrase(customer.getTotalVisits(), bodyMainFont));
-            table.addCell(new Phrase(customer.getTotal_points(), bodyMainFont));
-            table.addCell(new Phrase(customer.getTotalSpent(), bodyMainFont));
-        });
-        PdfPCell emptyCell = new PdfPCell(new Phrase());
-        emptyCell.setBorderWidth(0);
-        table.addCell(emptyCell);
-        table.addCell(emptyCell);
-        table.addCell(emptyCell);
-        table.addCell(emptyCell);
-        table.addCell(emptyCell);
-//        table.addCell(new Phrase(Optional.ofNullable(result.getTotalCommission()).orElse(BigDecimal.ZERO).setScale(2, BigDecimal.ROUND_HALF_EVEN).toString(), bodyMainFont));
-//        table.addCell(new Phrase(Optional.ofNullable(result.getTotalQuantity()).orElse(BigDecimal.ZERO).toString(), bodyMainFont));
-//        table.addCell(new Phrase(Optional.ofNullable(result.getTotalValue()).orElse(BigDecimal.ZERO).toString(), bodyMainFont));
-
-    }
 
 
 }

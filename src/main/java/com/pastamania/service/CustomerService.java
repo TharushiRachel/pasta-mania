@@ -1,6 +1,5 @@
 package com.pastamania.service;
 
-import java.io.ByteArrayInputStream;
 import java.util.Date;
 
 /**
@@ -12,6 +11,7 @@ public interface CustomerService {
 
     void initialCustomerPersist();
 
-    ByteArrayInputStream generateCustomerReportPDF( );
+    String parseThymeleafTemplate();
+
 
 }

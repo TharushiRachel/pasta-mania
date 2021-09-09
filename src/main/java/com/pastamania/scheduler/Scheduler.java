@@ -48,7 +48,7 @@ public class Scheduler {
         //itemService.initialStorePersist();
         //receiptService.initialPersist();
 
-        receiptService.initialPersist();
+       // receiptService.initialPersist();
 
     }
 }

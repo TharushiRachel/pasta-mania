@@ -3,6 +3,7 @@ package com.pastamania.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * @author Pasindu Lakmal
@@ -26,7 +27,7 @@ public class ReceiptPayment extends CreateModifyBaseEntity {
 
     private String type;
 
-    private String moneyAmount;
+    private BigDecimal moneyAmount;
 
     private String paidAt;
 

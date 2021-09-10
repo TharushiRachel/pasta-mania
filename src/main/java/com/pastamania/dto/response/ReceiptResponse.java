@@ -117,7 +117,7 @@ public class ReceiptResponse {
 
             private String name;
 
-            private Boolean rate;
+            private Double rate;
 
             @JsonProperty("money_amount")
             private String moneyAmount;
@@ -198,7 +198,7 @@ public class ReceiptResponse {
 
                 private String name;
 
-                private Boolean rate;
+                private Double rate;
 
                 @JsonProperty("money_amount")
                 private String moneyAmount;

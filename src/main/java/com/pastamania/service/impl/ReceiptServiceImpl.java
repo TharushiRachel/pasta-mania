@@ -2,6 +2,7 @@ package com.pastamania.service.impl;
 
 import com.pastamania.dto.response.ReceiptResponse;
 import com.pastamania.entity.*;
+import com.pastamania.enums.SyncStatus;
 import com.pastamania.repository.*;
 import com.pastamania.service.ReceiptService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,11 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Pasindu Lakmal
@@ -142,5 +148,56 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<Receipt> searchBySyncStatus(SyncStatus syncStatus) {
+        List<Receipt> receipts = receiptRepository.findAllBySyncStatus(syncStatus);
+        for (Receipt receipt : receipts) {
+            receipt.getPayments().size();
+            receipt.getReceiptLineItems().size();
+            receipt.getTotalTaxes().size();
+        }
+
+        return receipts;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Receipt> getPendingSyncReceipts() {
+        List<Receipt> pendingReceipts = receiptRepository.findAllBySyncStatusInAndErrorCountLessThanEqual(
+                Arrays.asList(SyncStatus.PENDING, SyncStatus.FAILED), 3);
+        for (Receipt receipt : pendingReceipts) {
+            receipt.getPayments().size();
+            receipt.getReceiptLineItems().size();
+            receipt.getTotalTaxes().size();
+        }
+
+        return pendingReceipts;
+    }
+
+    @Transactional
+    @Override
+    public void updateSyncStatus(SyncStatus syncStatus, Integer errorCount, List<Receipt> receipts) {
+        receiptRepository.updateReceiptSyncStatus(syncStatus, errorCount, receipts.stream().map(Receipt::getReceiptNo).collect(Collectors.toList()));
+    }
+
+    @Transactional
+    @Override
+    public Receipt update(Receipt receipt) {
+        Optional<Receipt> currentReceipt = receiptRepository.findById(receipt.getReceiptNo());
+        if (currentReceipt.isEmpty()) {
+            return null;
+        }
+        Receipt persistedReceipt = currentReceipt.get();
+        if (receipt.getSyncStatus() != null) {
+            persistedReceipt.setSyncStatus(receipt.getSyncStatus());
+        }
+        if (receipt.getErrorCount() != null) {
+            persistedReceipt.setErrorCount(receipt.getErrorCount());
+        }
+
+        receiptRepository.save(persistedReceipt);
+        return persistedReceipt;
+    }
 }
 

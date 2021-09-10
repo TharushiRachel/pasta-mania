@@ -1,8 +1,10 @@
 package com.pastamania.entity;
 
+import com.pastamania.enums.SyncStatus;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Set;
 
 /**
@@ -11,7 +13,6 @@ import java.util.Set;
 @Entity
 @Data
 public class Receipt extends CreateModifyBaseEntity {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,19 +38,19 @@ public class Receipt extends CreateModifyBaseEntity {
 
     private String source;
 
-    private Double totalMoney;
+    private BigDecimal totalMoney;
 
-    private Double totalTax;
+    private BigDecimal totalTax;
 
-    private Double pointsEarned;
+    private BigDecimal pointsEarned;
 
-    private Double pointsDeducted;
+    private BigDecimal pointsDeducted;
 
-    private Double pointBalance;
+    private BigDecimal pointBalance;
 
     private String customerId;
 
-    private Double totalDiscount;
+    private BigDecimal totalDiscount;
 
     private String employeeId;
 
@@ -74,5 +75,15 @@ public class Receipt extends CreateModifyBaseEntity {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<ReceiptPayment> payments;
+
+    @Column(columnDefinition = "varchar(50) not null default 'PENDING'")
+    private SyncStatus syncStatus = SyncStatus.PENDING;
+
+    @Column(columnDefinition = "int not null default 0")
+    private Integer errorCount = 0;
+
+    @ManyToOne
+    @JoinColumn(name = "api_log_id")
+    private ApiLog apiLog;
 
 }

@@ -72,7 +72,7 @@ public class DataSync {
     @Autowired
     private ApiLogService apiLogService;
 
-    @Scheduled(fixedRate = 360000)
+    @Scheduled(fixedRate = 300000)
     public void syncPosTransactionSalesData() {
 
         log.info("SyncSalesData started => {}" , LocalDateTime.now());

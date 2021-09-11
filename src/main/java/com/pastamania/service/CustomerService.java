@@ -1,5 +1,7 @@
 package com.pastamania.service;
 
+import com.pastamania.entity.Company;
+
 import java.util.Date;
 
 /**
@@ -7,9 +9,7 @@ import java.util.Date;
  */
 public interface CustomerService {
 
-    void retrieveCustomersAndPersist(Date date);
-
-    void initialCustomerPersist();
+    void retrieveCategoryAndPersist(Date date, Company company);
 
     String parseThymeleafTemplate();
 

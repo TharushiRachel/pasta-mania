@@ -60,5 +60,14 @@ public class CustomerResponse {
         @JsonProperty("permanent_deletion_at")
         private String permanentDeletionAt;
 
+        @JsonProperty("created_at")
+        private String createdAt;
+
+        @JsonProperty("updated_at")
+        private String updatedAt;
+
+        @JsonProperty("deleted_at")
+        private String deletedAt;
+
     }
 }

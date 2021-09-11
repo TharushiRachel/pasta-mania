@@ -4,6 +4,12 @@
   <title>Home page</title>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+  </style>
 </head>
 <body>
 <p>
@@ -11,7 +17,7 @@
 </p>
 
 <div>
-  <table id="customerList" >
+  <table id="customerList" style="width:100%" >
     <thead>
     <tr>
       <th> Customer Name </th>
@@ -35,7 +41,6 @@
       <td th:text="${customer.total_points}"></td>
       <td th:text="${customer.totalSpent}"></td>
     </tr>
-    <tr>----------------------------------------</tr>
     <tr>
       <td></td>
       <td ></td>

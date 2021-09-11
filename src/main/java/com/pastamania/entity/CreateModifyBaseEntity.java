@@ -1,11 +1,13 @@
 package com.pastamania.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Pasindu Lakmal
  */
-@Data
+@Getter
+@Setter
 public class CreateModifyBaseEntity {
 
     private String systemCreatedAt;

@@ -39,6 +39,15 @@ public class ItemResponse {
         @JsonProperty("category_id")
         private String categoryId;
 
+        @JsonProperty("created_at")
+        private String createdAt;
+
+        @JsonProperty("updated_at")
+        private String updatedAt;
+
+        @JsonProperty("deleted_at")
+        private String deletedAt;
+
         private List<ComponentData> components;
 
 

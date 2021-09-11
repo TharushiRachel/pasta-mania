@@ -88,4 +88,8 @@ public class Receipt extends CreateModifyBaseEntity {
     @JoinColumn(name = "api_log_id")
     private ApiLog apiLog;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
+
 }

@@ -1,5 +1,7 @@
 package com.pastamania.repository;
 
+import com.pastamania.entity.Company;
+import com.pastamania.entity.Item;
 import com.pastamania.entity.Receipt;
 import com.pastamania.enums.SyncStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +15,12 @@ import java.util.List;
  * @author Pasindu Lakmal
  */
 public interface ReceiptRepository extends JpaRepository<Receipt,Long> {
+
+    @Query("select r from Receipt r where r.company=?1 and r.createdAt= (SELECT max(r.createdAt) from Receipt r where r.company=?1)")
+    List<Receipt> findReceiptWithMaxCreatedDateAndCompany(Company company);
+
+    @Query("select r from Receipt r where r.company=?1 and r.updatedAt= (SELECT max(r.updatedAt) from Receipt r where r.company=?1)")
+    List<Receipt> findReceiptWithMaxUpdatedDateAndCompany(Company company);
 
     List<Receipt> findAllBySyncStatus(SyncStatus syncStatus);
 

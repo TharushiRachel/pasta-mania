@@ -1,22 +1,26 @@
 package com.pastamania.repository;
 
+import com.pastamania.entity.Company;
 import com.pastamania.entity.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 /**
  * @author Pasindu Lakmal
  */
-public interface ItemRepository extends JpaRepository<Item,Long> {
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
 
     Item findById(String id);
 
 
-//    @Query("select max(c.createdAt) from Category c ")
-//    Category findCustomerWithMaxCreatedDate();
-//
-//
-//    @Query("select max(c.updatedAt) from Category c ")
-//    Category findCustomerWithMaxUpdatedDate();
+    @Query("select i from Item i where i.company=?1 and i.createdAt= (SELECT max(i.createdAt) from Item i where i.company=?1)")
+    List<Item> findItemWithMaxCreatedDateAndCompany(Company company);
+
+
+    @Query("select i from Item i where i.company=?1 and i.updatedAt= (SELECT max(i.updatedAt) from Item i where i.company=?1)")
+    List<Item> findItemWithMaxUpdatedDateAndCompany(Company company);
 
 }

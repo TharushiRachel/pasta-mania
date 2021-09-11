@@ -14,22 +14,13 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @Setter
-public class Discount extends CreateModifyBaseEntity {
+public class Company {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long discountNo;
-
-    private String id;
-
-    private String type;
+    private Long id;
 
     private String name;
 
-    private Double discountPercent;
-
-    private Boolean restrictedAccess;
-
-    private String storesIds;
-
+    private String token;
 }

@@ -1,18 +1,17 @@
 package com.pastamania.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * @author Pasindu Lakmal
  */
 @Entity
-@Data
-public class Category extends  CreateModifyBaseEntity{
+@Getter
+@Setter
+public class Category extends CreateModifyBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +28,8 @@ public class Category extends  CreateModifyBaseEntity{
     private String updatedAt;
 
     private String deletedAt;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
 }

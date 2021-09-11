@@ -1,6 +1,6 @@
 package com.pastamania.scheduler;
 
-import com.pastamania.service.ReceiptService;
+import com.pastamania.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -19,20 +19,23 @@ import java.util.Date;
 public class Scheduler {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-//    @Autowired
-//    CustomerService customerService;
-//
-//    @Autowired
-//    CategoryService categoryService;
-//
-//    @Autowired
-//    StoreService storeService;
-//
-//    @Autowired
-//    DiscountService discountService;
-//
-//    @Autowired
-//    ItemService itemService;
+    @Autowired
+    CustomerService customerService;
+
+    @Autowired
+    CompanyService companyService;
+
+    @Autowired
+    CategoryService categoryService;
+
+    @Autowired
+    StoreService storeService;
+
+    @Autowired
+    DiscountService discountService;
+
+    @Autowired
+    ItemService itemService;
 
     @Autowired
     ReceiptService receiptService;
@@ -41,14 +44,17 @@ public class Scheduler {
     public void reportCurrentTime() {
         log.info("Current time = " + dateFormat.format(new Date()));
 
+        if(companyService.findAll().isEmpty()){
+            companyService.createInitialCompanies();
+        }
+        companyService.findAll().stream().forEach(company -> {
+           categoryService.retrieveCategoryAndPersist(new Date(), company);
+           itemService.retrieveItemAndPersist(new Date(),company);
+           receiptService.retrieveReceiptAndPersist(new Date(),company);
+        });
         //customerService.initialCustomerPersist();
-        //categoryService.initialCategoryPersist();
         //storeService.initialStorePersist();
         //discountService.initialStorePersist();
-        //itemService.initialStorePersist();
-        //receiptService.initialPersist();
-
-       // receiptService.initialPersist();
 
     }
 }

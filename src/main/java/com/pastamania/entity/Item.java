@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "item")
-public class Item extends CreateModifyBaseEntity {
+public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,5 +57,15 @@ public class Item extends CreateModifyBaseEntity {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<ItemVariant> variants;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
+
+    private String createdAt;
+
+    private String updatedAt;
+
+    private String deletedAt;
 
 }

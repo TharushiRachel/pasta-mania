@@ -1,8 +1,10 @@
 package com.pastamania.service;
 
+import com.pastamania.entity.Company;
 import com.pastamania.entity.Receipt;
 import com.pastamania.enums.SyncStatus;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -10,7 +12,7 @@ import java.util.List;
  */
 public interface ReceiptService {
 
-    void initialPersist();
+    void retrieveReceiptAndPersist(Date date, Company company);
 
     List<Receipt> searchBySyncStatus(SyncStatus syncStatus);
 

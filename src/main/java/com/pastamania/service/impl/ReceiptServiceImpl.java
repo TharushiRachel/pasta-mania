@@ -1,5 +1,7 @@
 package com.pastamania.service.impl;
 
+import com.pastamania.component.RestApiClient;
+import com.pastamania.configuration.ConfigProperties;
 import com.pastamania.dto.response.ReceiptResponse;
 import com.pastamania.entity.*;
 import com.pastamania.enums.SyncStatus;
@@ -13,9 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -57,22 +60,70 @@ public class ReceiptServiceImpl implements ReceiptService {
     @Autowired
     LineItemLineModifierRepository lineItemLineModifierRepository;
 
+
+    @Autowired
+    private RestApiClient restApiClient;
+
+    @Autowired
+    private CompanyRepository companyRepository;
+
+
+    @Autowired
+    private ConfigProperties configProperties;
+
+
     @Override
-    public void initialPersist() {
+    public void retrieveReceiptAndPersist(Date date, Company company) {
+
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        df.setTimeZone(tz); // get the time zone
+        String nowAsISO = df.format(date);
+
+        List<Receipt> lastUpdatedReceipt = receiptRepository.findReceiptWithMaxUpdatedDateAndCompany(company);
 
         RestTemplate restTemplate = new RestTemplate();
         ModelMapper modelMapper = new ModelMapper();
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + "d22e68278c144eb8b22c50a2623bccc9");
+        headers.set("Authorization", "Bearer " + company.getToken());
         headers.setContentType(MediaType.APPLICATION_JSON);
         String requestJson = "{}";
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
-        //newly created
-        ResponseEntity<ReceiptResponse> createdResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/receipts", HttpMethod.GET, entity, ReceiptResponse.class);
+        if (lastUpdatedReceipt.isEmpty()) {
+            ResponseEntity<ReceiptResponse> receiptResponseResponseEntity = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl() + "receipts", HttpMethod.GET, entity, ReceiptResponse.class);
+            Company companyOp = companyRepository.findById(company.getId()).get();
+            saveReceiptWithMappedValues(modelMapper, receiptResponseResponseEntity, companyOp);
 
-        createdResponse.getBody().getReceipts().forEach(receipt -> {
+        } else {
+            String updatedAt = lastUpdatedReceipt.get(0).getUpdatedAt();
+            SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            try {
+                Date convertedDate = sourceFormat.parse(updatedAt);
+                Calendar c = Calendar.getInstance();
+                c.setTime(convertedDate);
+                c.add(Calendar.SECOND, 1);
+                String oneSecondAddedDate = sourceFormat.format(c.getTime());
+                ResponseEntity<ReceiptResponse> receiptResponseResponseEntity = restTemplate.exchange("https://api.loyverse.com/v1.0/receipts?updated_at_min=" + oneSecondAddedDate + "&updated_at_max=" + nowAsISO + "", HttpMethod.GET, entity, ReceiptResponse.class);
+                Company companyOp = companyRepository.findById(company.getId()).get();
+                if (receiptResponseResponseEntity.getBody().getReceipts() != null) {
+                    saveReceiptWithMappedValues(modelMapper, receiptResponseResponseEntity, companyOp);
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
+    }
+
+    private void saveReceiptWithMappedValues(ModelMapper modelMapper, ResponseEntity<ReceiptResponse> receiptResponseResponseEntity, Company companyOp) {
+        receiptResponseResponseEntity.getBody().getReceipts().forEach(receipt -> {
             Receipt receipt1 = modelMapper.map(receipt, Receipt.class);
+            receipt1.setCompany(companyOp);
             if (receipt1.getTotalDiscounts() != null) receipt1.getTotalDiscounts().clear();
             if (receipt1.getTotalTaxes() != null) receipt1.getTotalTaxes().clear();
             if (receipt1.getReceiptLineItems() != null) receipt1.getReceiptLineItems().clear();
@@ -142,9 +193,6 @@ public class ReceiptServiceImpl implements ReceiptService {
 
             }
         });
-
-
-        System.out.println("=============================");
 
     }
 

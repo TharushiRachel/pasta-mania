@@ -4,10 +4,10 @@ import com.pastamania.component.RestApiClient;
 import com.pastamania.configuration.ConfigProperties;
 import com.pastamania.dto.response.CategoryResponse;
 import com.pastamania.entity.Category;
+import com.pastamania.entity.Company;
 import com.pastamania.repository.CategoryRepository;
+import com.pastamania.repository.CompanyRepository;
 import com.pastamania.service.CategoryService;
-import com.pastamania.service.CustomerService;
-import com.pastamania.util.AuthUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -36,82 +38,65 @@ public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
 
     @Autowired
+    CompanyRepository companyRepository;
+
+    @Autowired
     private RestApiClient restApiClient;
 
     @Autowired
     private ConfigProperties configProperties;
 
-    @Autowired
-    private com.pastamania.modelmapper.ModelMapper modelMapperLocal;
-
-//
-//    Please see below API Access Tokens for our brands.
-//
-//    Brand: Island Wraps
-//
-//    API Access Token: 3e405b31626349b699a44984f8861c5b
-//
-//    Brand: PastaMania
-//
-//    API Access Token: d22e68278c144eb8b22c50a2623bccc9
-
 
     @Override
-    public void retrieveCategoryAndPersist(Date date) {
+    public void retrieveCategoryAndPersist(Date date, Company company) {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         df.setTimeZone(tz); // get the time zone
         String nowAsISO = df.format(date);
 
-        Category latestCreatedCategory = categoryRepository.findCustomerWithMaxCreatedDate();
-        Category lastUpdatedCategory = categoryRepository.findCustomerWithMaxUpdatedDate();
+        Category lastUpdatedCategory = categoryRepository.findCustomerWithMaxCreatedDateAndCompany(company);
 
         RestTemplate restTemplate = new RestTemplate();
         ModelMapper modelMapper = new ModelMapper();
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + "d22e68278c144eb8b22c50a2623bccc9");
+        headers.set("Authorization", "Bearer " + company.getToken());
         headers.setContentType(MediaType.APPLICATION_JSON);
         String requestJson = "{}";
-        HttpEntity<String> entity = new HttpEntity <> (requestJson, headers);
+        HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
-        //newly created
-        ResponseEntity<CategoryResponse> createdResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/customers?created_at_min="+latestCreatedCategory.getCreatedAt()+"&created_at_max="+nowAsISO+"", HttpMethod.GET, entity, CategoryResponse.class);
-        List<Category> createdCategories = createdResponse.getBody().getCategories().stream().map(category ->
-                modelMapper.map(category, Category.class)).collect(Collectors.toList());
+        if (lastUpdatedCategory == null) {
+            ResponseEntity<CategoryResponse> createdResponse = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl() + "categories", HttpMethod.GET, entity, CategoryResponse.class);
+            List<Category> createdCategories = createdResponse.getBody().getCategories().stream().map(category ->
+                    modelMapper.map(category, Category.class)).collect(Collectors.toList());
 
-        categoryRepository.saveAll(createdCategories);
+            Company companyOp = companyRepository.findById(company.getId()).get();
+            createdCategories.forEach(category -> category.setCompany(companyOp));
+            categoryRepository.saveAll(createdCategories);
+        } else {
+            String updatedAt = lastUpdatedCategory.getCreatedAt();
+            SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            try {
+                Date convertedDate = sourceFormat.parse(updatedAt);
+                Calendar c = Calendar.getInstance();
+                c.setTime(convertedDate);
+                c.add(Calendar.SECOND, 1);
+                String oneSecondAddedDate = sourceFormat.format(c.getTime());
+                ResponseEntity<CategoryResponse> updatedResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/customers?created_at_min=" + oneSecondAddedDate + "&created_at_max=" + nowAsISO + "", HttpMethod.GET, entity, CategoryResponse.class);
 
-        //newly updated
-        ResponseEntity<CategoryResponse> updatedResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/customers?updated_at_min="+lastUpdatedCategory.getUpdatedAt()+"&updated_at_max="+nowAsISO+"", HttpMethod.GET, entity, CategoryResponse.class);
-        List<Category> updatedCategories = updatedResponse.getBody().getCategories().stream().map(category ->
-                modelMapper.map(category, Category.class)).collect(Collectors.toList());
+                if (updatedResponse.getBody().getCategories() != null) {
+                    List<Category> updatedCategories = updatedResponse.getBody().getCategories().stream().map(category ->
+                            modelMapper.map(category, Category.class)).collect(Collectors.toList());
+                    categoryRepository.saveAll(updatedCategories);
+                }
 
-        categoryRepository.saveAll(updatedCategories);
 
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
+        }
     }
-
-    @Override
-    public void initialCategoryPersist() {
-
-        //RestTemplate restTemplate = new RestTemplate();
-        //ModelMapper modelMapper = new ModelMapper();
-
-        /*HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + "d22e68278c144eb8b22c50a2623bccc9");
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        String requestJson = "{}";
-        HttpEntity<String> entity = new HttpEntity <> (requestJson, headers);*/
-
-        //newly created
-        ResponseEntity<CategoryResponse> createdResponse = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl()+"categories", HttpMethod.GET, AuthUtil.getEntity("d22e68278c144eb8b22c50a2623bccc9"), CategoryResponse.class);
-        /*List<Category> categories = createdResponse.getBody().getCategories().stream().map(category ->
-                modelMapper.map(category, Category.class)).collect(Collectors.toList());*/
-
-        List<Category> categories = modelMapperLocal.map(createdResponse.getBody().getCategories(),Category.class);
-
-        categoryRepository.saveAll(categories);
-
-    }
-
 
 }

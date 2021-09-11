@@ -1,6 +1,7 @@
 package com.pastamania.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -9,9 +10,10 @@ import java.util.Set;
  * @author Pasindu Lakmal
  */
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "item")
-public class Item extends  CreateModifyBaseEntity{
+public class Item extends CreateModifyBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,7 +55,7 @@ public class Item extends  CreateModifyBaseEntity{
 
     private String option3_name;
 
-    @OneToMany(cascade= {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<ItemVariant> variants;
 
 }

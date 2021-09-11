@@ -1,6 +1,7 @@
 package com.pastamania.entity;//package com.pastamania.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -8,8 +9,9 @@ import javax.persistence.*;
  * @author Pasindu Lakmal
  */
 @Entity
-@Data
-@Table(name="line_item_line_modifier")
+@Getter
+@Setter
+@Table(name = "line_item_line_modifier")
 public class LineItemLineModifier extends CreateModifyBaseEntity {
 
     @Id

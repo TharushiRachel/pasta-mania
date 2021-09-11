@@ -1,7 +1,8 @@
 package com.pastamania.entity;
 
 import com.pastamania.enums.SyncStatus;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -11,7 +12,8 @@ import java.util.Set;
  * @author Pasindu Lakmal
  */
 @Entity
-@Data
+@Getter
+@Setter
 public class Receipt extends CreateModifyBaseEntity {
 
     @Id
@@ -64,16 +66,16 @@ public class Receipt extends CreateModifyBaseEntity {
 
     private Integer surcharge;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "receipt")
     private Set<ReceiptTotalDiscount> totalDiscounts;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "receipt")
     private Set<ReceiptTotalTax> totalTaxes;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "receipt")
     private Set<ReceiptLineItem> receiptLineItems;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "receipt")
     private Set<ReceiptPayment> payments;
 
     @Column(columnDefinition = "varchar(50) not null default 'PENDING'")

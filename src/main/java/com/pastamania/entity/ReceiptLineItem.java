@@ -1,6 +1,7 @@
 package com.pastamania.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -9,7 +10,8 @@ import java.util.Set;
  * @author Pasindu Lakmal
  */
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "receipt_line_item")
 public class ReceiptLineItem extends CreateModifyBaseEntity {
 
@@ -47,13 +49,13 @@ public class ReceiptLineItem extends CreateModifyBaseEntity {
     @JoinColumn(name = "receipt_id", nullable = false)
     private Receipt receipt;
 
-    @OneToMany(cascade= {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "receiptLineItem")
     private Set<LineItemLineDiscount> lineDiscounts;
 
-    @OneToMany(cascade= {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "receiptLineItem")
     private Set<LineItemLineTax> lineTaxes;
 
-    @OneToMany(cascade= {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "receiptLineItem")
     private Set<LineItemLineModifier> lineModifiers;
 
 }

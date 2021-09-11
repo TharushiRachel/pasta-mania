@@ -1,6 +1,7 @@
 package com.pastamania.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -8,7 +9,8 @@ import javax.persistence.*;
  * @author Pasindu Lakmal
  */
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "receipt_total_discount")
 public class ReceiptTotalDiscount extends CreateModifyBaseEntity {
 

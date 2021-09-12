@@ -2,6 +2,7 @@ package com.pastamania.service.impl;
 
 import com.pastamania.component.RestApiClient;
 import com.pastamania.configuration.ConfigProperties;
+import com.pastamania.dto.response.ItemResponse;
 import com.pastamania.dto.response.ReceiptResponse;
 import com.pastamania.entity.*;
 import com.pastamania.enums.SyncStatus;
@@ -73,7 +74,8 @@ public class ReceiptServiceImpl implements ReceiptService {
 
 
     @Override
-    public void retrieveReceiptAndPersist(Date date, Company company) {
+    public void retrieveReceiptAndPersist(Date date, Company company) throws ParseException {
+
 
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -81,6 +83,8 @@ public class ReceiptServiceImpl implements ReceiptService {
         String nowAsISO = df.format(date);
 
         List<Receipt> lastUpdatedReceipt = receiptRepository.findReceiptWithMaxUpdatedDateAndCompany(company);
+        List<Receipt> finalCreatedReceipt = receiptRepository.findReceiptWithMinCreatedDateAndCompany(company);
+
 
         RestTemplate restTemplate = new RestTemplate();
         ModelMapper modelMapper = new ModelMapper();
@@ -90,32 +94,37 @@ public class ReceiptServiceImpl implements ReceiptService {
         String requestJson = "{}";
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
-        if (lastUpdatedReceipt.isEmpty()) {
-            ResponseEntity<ReceiptResponse> receiptResponseResponseEntity = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl() + "receipts", HttpMethod.GET, entity, ReceiptResponse.class);
-            Company companyOp = companyRepository.findById(company.getId()).get();
-            saveReceiptWithMappedValues(modelMapper, receiptResponseResponseEntity, companyOp);
-
+        var val = "";
+        if (finalCreatedReceipt.isEmpty()) {
+            val = nowAsISO;
         } else {
+            String updatedAt = finalCreatedReceipt.get(0).getCreatedAt();
+            SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date convertedDate = sourceFormat.parse(updatedAt);
+            Calendar c = Calendar.getInstance();
+            c.setTime(convertedDate);
+            c.add(Calendar.SECOND, -1);
+            val = sourceFormat.format(c.getTime());
+
+        }
+        ResponseEntity<ReceiptResponse> itemResponseResponseEntity = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl() + "receipts?created_at_min=2021-05-01T00:00:00.962Z&created_at_max=" + val + "&limit=250", HttpMethod.GET, entity, ReceiptResponse.class);
+        Company companyOp = companyRepository.findById(company.getId()).get();
+        saveReceiptWithMappedValues(modelMapper, itemResponseResponseEntity, companyOp);
+
+        if (itemResponseResponseEntity.getBody().getReceipts().isEmpty()) {
             String updatedAt = lastUpdatedReceipt.get(0).getUpdatedAt();
             SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            try {
-                Date convertedDate = sourceFormat.parse(updatedAt);
-                Calendar c = Calendar.getInstance();
-                c.setTime(convertedDate);
-                c.add(Calendar.SECOND, 1);
-                String oneSecondAddedDate = sourceFormat.format(c.getTime());
-                ResponseEntity<ReceiptResponse> receiptResponseResponseEntity = restTemplate.exchange("https://api.loyverse.com/v1.0/receipts?updated_at_min=" + oneSecondAddedDate + "&updated_at_max=" + nowAsISO + "", HttpMethod.GET, entity, ReceiptResponse.class);
-                Company companyOp = companyRepository.findById(company.getId()).get();
-                if (receiptResponseResponseEntity.getBody().getReceipts() != null) {
-                    saveReceiptWithMappedValues(modelMapper, receiptResponseResponseEntity, companyOp);
-                }
-
-            } catch (ParseException e) {
-                e.printStackTrace();
+            Date convertedDate = sourceFormat.parse(updatedAt);
+            Calendar c = Calendar.getInstance();
+            c.setTime(convertedDate);
+            c.add(Calendar.SECOND, 1);
+            String oneSecondAddedDate = sourceFormat.format(c.getTime());
+            ResponseEntity<ItemResponse> itemResponseResponseEntityUpdated = restTemplate.exchange("https://api.loyverse.com/v1.0/receipts?updated_at_min=" + oneSecondAddedDate + "&updated_at_max=" + nowAsISO + "", HttpMethod.GET, entity, ItemResponse.class);
+            if (itemResponseResponseEntityUpdated.getBody().getItems() != null) {
+                saveReceiptWithMappedValues(modelMapper, itemResponseResponseEntity, companyOp);
             }
-
-
         }
 
     }

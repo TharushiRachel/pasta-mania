@@ -62,20 +62,5 @@ public class CustomerController {
     }
 
 
-    @PostMapping("${app.endpoint.customersCreate}")
-    public ResponseEntity<SingleResponseWrapper<StoreCreateResponse>> create(
-            @Validated @RequestBody StoreCreateRequest request) {
-
-        log.info("Customer creation start {}", request.getToken());
-
-        customerService.initialCustomerPersist();
-
-        StoreCreateResponse response = new StoreCreateResponse();
-
-        response.setStatus(0);
-
-        return new ResponseEntity<SingleResponseWrapper<StoreCreateResponse>>(
-                new SingleResponseWrapper<StoreCreateResponse>(response), HttpStatus.CREATED);
-    }
 
 }

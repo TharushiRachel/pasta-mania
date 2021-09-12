@@ -58,7 +58,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public void retrieveItemAndPersist(Date date, Company company) {
+    public void retrieveItemAndPersist(Date date, Company company) throws ParseException {
 
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -66,6 +66,8 @@ public class ItemServiceImpl implements ItemService {
         String nowAsISO = df.format(date);
 
         List<Item> lastUpdatedItems = itemRepository.findItemWithMaxUpdatedDateAndCompany(company);
+        List<Item> finalCreatedItem = itemRepository.findItemWithMinCreatedDateAndCompany(company);
+
 
         RestTemplate restTemplate = new RestTemplate();
         ModelMapper modelMapper = new ModelMapper();
@@ -75,32 +77,37 @@ public class ItemServiceImpl implements ItemService {
         String requestJson = "{}";
         HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
-        if (lastUpdatedItems.isEmpty()) {
-            ResponseEntity<ItemResponse> itemResponseResponseEntity = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl() + "items", HttpMethod.GET, entity, ItemResponse.class);
-            Company companyOp = companyRepository.findById(company.getId()).get();
-            saveItemWithMappedValues(modelMapper, itemResponseResponseEntity, companyOp);
-
+        var val = "";
+        if (finalCreatedItem.isEmpty()) {
+            val = nowAsISO;
         } else {
+            String updatedAt = finalCreatedItem.get(0).getCreatedAt();
+            SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date convertedDate = sourceFormat.parse(updatedAt);
+            Calendar c = Calendar.getInstance();
+            c.setTime(convertedDate);
+            c.add(Calendar.SECOND, -1);
+            val = sourceFormat.format(c.getTime());
+
+        }
+        ResponseEntity<ItemResponse> itemResponseResponseEntity = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl() + "items?created_at_min=1998-02-28T23:11:13.962Z&created_at_max=" + val + "&limit=100", HttpMethod.GET, entity, ItemResponse.class);
+        Company companyOp = companyRepository.findById(company.getId()).get();
+        saveItemWithMappedValues(modelMapper, itemResponseResponseEntity, companyOp);
+
+        if (itemResponseResponseEntity.getBody().getItems().isEmpty()) {
             String updatedAt = lastUpdatedItems.get(0).getUpdatedAt();
             SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            try {
-                Date convertedDate = sourceFormat.parse(updatedAt);
-                Calendar c = Calendar.getInstance();
-                c.setTime(convertedDate);
-                c.add(Calendar.SECOND, 1);
-                String oneSecondAddedDate = sourceFormat.format(c.getTime());
-                ResponseEntity<ItemResponse> itemResponseResponseEntity = restTemplate.exchange("https://api.loyverse.com/v1.0/items?updated_at_min=" + oneSecondAddedDate + "&updated_at_max=" + nowAsISO + "", HttpMethod.GET, entity, ItemResponse.class);
-                Company companyOp = companyRepository.findById(company.getId()).get();
-                if (itemResponseResponseEntity.getBody().getItems() != null) {
-                    saveItemWithMappedValues(modelMapper, itemResponseResponseEntity, companyOp);
-                }
-
-            } catch (ParseException e) {
-                e.printStackTrace();
+            Date convertedDate = sourceFormat.parse(updatedAt);
+            Calendar c = Calendar.getInstance();
+            c.setTime(convertedDate);
+            c.add(Calendar.SECOND, 1);
+            String oneSecondAddedDate = sourceFormat.format(c.getTime());
+            ResponseEntity<ItemResponse> itemResponseResponseEntityUpdated = restTemplate.exchange("https://api.loyverse.com/v1.0/items?updated_at_min=" + oneSecondAddedDate + "&updated_at_max=" + nowAsISO + "", HttpMethod.GET, entity, ItemResponse.class);
+            if (itemResponseResponseEntityUpdated.getBody().getItems() != null) {
+                saveItemWithMappedValues(modelMapper, itemResponseResponseEntity, companyOp);
             }
-
-
         }
 
     }

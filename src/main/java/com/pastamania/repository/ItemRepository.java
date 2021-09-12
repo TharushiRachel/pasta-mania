@@ -19,6 +19,9 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("select i from Item i where i.company=?1 and i.createdAt= (SELECT max(i.createdAt) from Item i where i.company=?1)")
     List<Item> findItemWithMaxCreatedDateAndCompany(Company company);
 
+    @Query("select i from Item i where i.company=?1 and i.createdAt= (SELECT min(i.createdAt) from Item i where i.company=?1)")
+    List<Item> findItemWithMinCreatedDateAndCompany(Company company);
+
 
     @Query("select i from Item i where i.company=?1 and i.updatedAt= (SELECT max(i.updatedAt) from Item i where i.company=?1)")
     List<Item> findItemWithMaxUpdatedDateAndCompany(Company company);

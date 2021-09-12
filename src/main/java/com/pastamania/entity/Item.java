@@ -55,7 +55,7 @@ public class Item {
 
     private String option3_name;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "item")
     private Set<ItemVariant> variants;
 
     @OneToOne(cascade = CascadeType.ALL)

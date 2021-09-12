@@ -22,6 +22,9 @@ public interface ReceiptRepository extends JpaRepository<Receipt,Long> {
     @Query("select r from Receipt r where r.company=?1 and r.updatedAt= (SELECT max(r.updatedAt) from Receipt r where r.company=?1)")
     List<Receipt> findReceiptWithMaxUpdatedDateAndCompany(Company company);
 
+    @Query("select r from Receipt r where r.company=?1 and r.createdAt= (SELECT min(r.createdAt) from Receipt r where r.company=?1)")
+    List<Receipt> findReceiptWithMinCreatedDateAndCompany(Company company);
+
     List<Receipt> findAllBySyncStatus(SyncStatus syncStatus);
 
     List<Receipt> findAllBySyncStatusInAndErrorCountLessThanEqual(List<SyncStatus> statuses, Integer errorCount);

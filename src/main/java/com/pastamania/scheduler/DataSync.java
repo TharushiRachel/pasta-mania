@@ -9,7 +9,9 @@ import com.pastamania.dto.response.SalesDataSendResponse;
 import com.pastamania.entity.Receipt;
 import com.pastamania.entity.ReceiptPayment;
 import com.pastamania.entity.ReceiptTotalTax;
+import com.pastamania.enums.Currency;
 import com.pastamania.enums.SyncStatus;
+import com.pastamania.enums.TaxType;
 import com.pastamania.service.ReceiptService;
 import com.pastamania.service.ApiLogService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,13 +37,6 @@ import java.util.stream.Collectors;
 @Component
 public class DataSync {
 
-    private static final String SALES_CURRENCY = "LKR";
-    private static final String PAYMENT_CURRENCY = "LKR";
-    private static final String SALES_TYPE_SALES = "Sales";
-    private static final String SALES_TYPE_REFUND = "Refund";
-    private static final String SALES_TYPE_RETURN = "Return";
-    private static final String SALES_TYPE_EXCHANGE = "Exchange";
-    private static final String SALES_TYPE_VOID = "Void";
     private static final String BATCH_CODE_FORMAT = "yyyyMMddHHssmm";
     private static final String RECEIPT_DATE_FORMAT = "dd/MM/uuuu";
 
@@ -165,27 +160,36 @@ public class DataSync {
             } else {
                 salesData.setNoOfItems(0);
             }
-            salesData.setSalesCurrency(SALES_CURRENCY); //TODO: Where can we get it?
-            salesData.setTotalSalesAmtB4Tax(receipt.getTotalMoney().subtract(receipt.getTotalTax())); //TODO: Is this correct?
-            salesData.setTotalSalesAmtAfterTax(receipt.getTotalMoney()); //TODO: Is this correct?
-            if (receipt.getTotalTaxes() != null && !receipt.getTotalTaxes().isEmpty())  {
+            salesData.setSalesCurrency(Currency.LKR.getValue());
+            salesData.setTotalSalesAmtB4Tax(receipt.getTotalMoney().subtract(receipt.getTotalTax()));
+            salesData.setTotalSalesAmtAfterTax(receipt.getTotalMoney());
+            // Tax and Service charge calculation
+            if (receipt.getTotalTaxes() != null && !receipt.getTotalTaxes().isEmpty()) {
                 salesData.setSalesTaxRate(receipt.getTotalTaxes().stream()
                         .map(ReceiptTotalTax::getRate)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)); //TODO: Is this correct?
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
+                salesData.setServiceChargeAmt(receipt.getTotalTaxes().stream()
+                        .filter(tax -> tax.getName().equalsIgnoreCase(TaxType.SERVICE_CHARGE.getLabel()))
+                        .map(ReceiptTotalTax::getMoneyAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
             } else {
                 salesData.setSalesTaxRate(BigDecimal.ZERO);
+                salesData.setServiceChargeAmt(BigDecimal.ZERO);
             }
-            salesData.setServiceChargeAmt(BigDecimal.ZERO); //TODO: How can we get it?
+
             if (receipt.getPayments() != null && !receipt.getPayments().isEmpty()) {
                 salesData.setPaymentAmt(receipt.getPayments().stream()
-                        .map(ReceiptPayment::getMoneyAmount).reduce(BigDecimal.ZERO, BigDecimal::add));
-                salesData.setPaymentMethod(receipt.getPayments().stream().map(ReceiptPayment::getName).collect(Collectors.joining(",")));
+                        .map(ReceiptPayment::getMoneyAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
+                salesData.setPaymentMethod(receipt.getPayments().stream()
+                        .map(ReceiptPayment::getName)
+                        .collect(Collectors.joining(",")));
             } else {
                 salesData.setPaymentAmt(BigDecimal.ZERO);
-                salesData.setPaymentMethod("Cash"); //TODO: Can we have this situation? i.e empty payments?
+                salesData.setPaymentMethod("Cash");
             }
-            salesData.setPaymentCurrency(PAYMENT_CURRENCY); //TODO:
-            salesData.setSalesType(receipt.getReceiptType().equals("SALE") ? SALES_TYPE_SALES : SALES_TYPE_SALES); //TODO: Other sales type from loyverse?
+            salesData.setPaymentCurrency(Currency.LKR.getLabel());
+            salesData.setSalesType(receipt.getReceiptType());
             salesData.setSalesDiscountAmt(receipt.getTotalDiscount());
 
             salesDataList.add(salesData);

@@ -75,7 +75,7 @@ public class DataSync {
     @Autowired
     private ApiLogService apiLogService;
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(cron = "${shangrilaSync.executionInterval}")
     public void syncPosTransactionSalesData() {
 
         log.info("SyncSalesData started => {}" , LocalDateTime.now());

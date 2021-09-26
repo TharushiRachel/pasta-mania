@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Home page</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    tr.spaceUnder>td {
+      padding-bottom: 1em;
+    }
+  </style>
+</head>
+<body>
+<p>
+  <span th:text="Customers"></span>
+</p>
+
+<div>
+  <table id="categoryList" style="width:100%" >
+    <thead>
+    <tr>
+      <th> Category </th>
+      <th> Item Description </th>
+      <th> Type </th>
+      <th> Item Sold </th>
+      <th> Gross sale </th>
+      <th> Item Refund </th>
+      <th> Refunds </th>
+      <th> Discounts </th>
+      <th> Net Sales </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="instance : ${categoryList}">
+      <td th:text="${instance.value.category}"></td>
+      <td>
+        <span th:each="itemDto : ${instance.value.itemDtoMap}">
+        <p th:text="${itemDto.value.itemName}"></p>
+        </span>
+      </td>
+      <td>
+        <span th:each="itemDto : ${instance.value.itemDtoMap}">
+          <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
+        <p th:text="${itemTypeDto.value.variantName}"></p>
+          </span>
+        </span>
+      </td>
+      <td>
+        <span th:each="itemDto : ${instance.value.itemDtoMap}">
+          <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
+        <p th:text="${itemTypeDto.value.itemSoldCount}"></p>
+          </span>
+        </span>
+      </td>
+        <td>
+        <span th:each="itemDto : ${instance.value.itemDtoMap}">
+          <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
+                  <p th:text="${itemTypeDto.value.grossSale}"></p>
+          </span>
+        </span>
+        </td>
+        <td>
+        <span th:each="itemDto : ${instance.value.itemDtoMap}">
+          <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
+                  <p th:text="${itemTypeDto.value.refundedCount}"></p>
+          </span>
+        </span>
+        </td>
+        <td>
+        <span th:each="itemDto : ${instance.value.itemDtoMap}">
+          <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
+                  <p th:text="${itemTypeDto.value.refundedAmount}"></p>
+          </span>
+        </span>
+        </td>
+      <td>
+
+      </td>
+
+      <td>
+        <span th:each="itemDto : ${instance.value.itemDtoMap}">
+          <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
+                  <p th:text="${itemTypeDto.value.netTotalSale}"></p>
+          </span>
+        </span>
+      </td>
+
+
+    </tr>
+<!--    <span th:each="category : ${categoryList}">-->
+<!--      <tr th:each="itemDto: ${category.value.itemDtoMap}">-->
+<!--        <td  th:text="${itemDto.value.itemName}"></td>-->
+<!--      </tr>-->
+<!--    </span>-->
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

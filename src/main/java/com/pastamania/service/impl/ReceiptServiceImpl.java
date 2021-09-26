@@ -104,7 +104,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             Date convertedDate = sourceFormat.parse(updatedAt);
             Calendar c = Calendar.getInstance();
             c.setTime(convertedDate);
-            c.add(Calendar.SECOND, -1);
+            c.add(Calendar.MILLISECOND, -1);
             val = sourceFormat.format(c.getTime());
 
         }

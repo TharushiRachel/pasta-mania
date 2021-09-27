@@ -5,5 +5,7 @@ package com.pastamania.service;
  */
 public interface ReceiptSupportedReportService {
 
+    String parseThymeleafTemplateForDailySaleReport();
+
     String parseThymeleafTemplateForDailySaleMixReport();
 }

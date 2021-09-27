@@ -37,8 +37,40 @@ public class ReceiptSupportedReportServiceImpl implements ReceiptSupportedReport
 
 
     @Override
-    public String parseThymeleafTemplateForDailySaleMixReport() {
+    public String parseThymeleafTemplateForDailySaleReport() {
 
+        Map<String, CategoryDto> categoryDtoMap = getStringCategoryDtoMap();
+
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+
+        Context context = new Context();
+        context.setVariable("categoryList", categoryDtoMap);
+
+        return templateEngine.process("daily_sale_report_template", context);
+
+    }
+
+    @Override
+    public String parseThymeleafTemplateForDailySaleMixReport() {
+        Map<String, CategoryDto> categoryDtoMap = getStringCategoryDtoMap();
+
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        TemplateEngine templateEngine = new TemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+
+        Context context = new Context();
+        context.setVariable("categoryList", categoryDtoMap);
+
+        return templateEngine.process("daily_sale_mix_report_template", context);
+    }
+
+    private Map<String, CategoryDto> getStringCategoryDtoMap() {
         List<DailySalesMixReport> dataForDailySaleMixReport = receiptRepository.findDataForDailySaleMixReport(null, null, null);
         List<DailySalesMixReportDto> dailySalesMixReportDtoList = modelMapper.map(dataForDailySaleMixReport, DailySalesMixReportDto.class);
 
@@ -122,19 +154,10 @@ public class ReceiptSupportedReportServiceImpl implements ReceiptSupportedReport
             });
 
         });
-
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setSuffix(".html");
-        templateResolver.setTemplateMode(TemplateMode.HTML);
-        TemplateEngine templateEngine = new TemplateEngine();
-        templateEngine.setTemplateResolver(templateResolver);
-
-        Context context = new Context();
-        context.setVariable("categoryList", categoryDtoMap);
-
-        return templateEngine.process("daily_sale_report_template", context);
-
+        return categoryDtoMap;
     }
+
+
 
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();

@@ -15,17 +15,14 @@
   </style>
 </head>
 <body>
-<p>
-  <span th:text="Daily Sales Mix Report"></span>
-</p>
+<p>Daily Sales Mix Report - Modifiers/Add-ons</p>
 
 <div>
   <table id="categoryList" style="width:100%" >
     <thead>
     <tr>
-      <th> Category </th>
-      <th> Item Description </th>
-      <th> Type </th>
+      <th> Modifier Category </th>
+      <th> Option Name </th>
       <th> Item Sold </th>
       <th> Gross sale </th>
       <th> Item Refund </th>
@@ -37,11 +34,6 @@
     <tbody>
     <tr th:each="instance : ${categoryList}">
       <td th:text="${instance.value.category}"></td>
-      <td>
-        <span th:each="itemDto : ${instance.value.itemDtoMap}">
-        <p th:text="${itemDto.value.itemName}"></p>
-        </span>
-      </td>
       <td>
         <span th:each="itemDto : ${instance.value.itemDtoMap}">
           <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
@@ -56,27 +48,27 @@
           </span>
         </span>
       </td>
-        <td>
+      <td>
         <span th:each="itemDto : ${instance.value.itemDtoMap}">
           <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
                   <p th:text="${itemTypeDto.value.grossSale}"></p>
           </span>
         </span>
-        </td>
-        <td>
+      </td>
+      <td>
         <span th:each="itemDto : ${instance.value.itemDtoMap}">
           <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
                   <p th:text="${itemTypeDto.value.refundedCount}"></p>
           </span>
         </span>
-        </td>
-        <td>
+      </td>
+      <td>
         <span th:each="itemDto : ${instance.value.itemDtoMap}">
           <span th:each="itemTypeDto : ${itemDto.value.itemTypeDtoMap}">
                   <p th:text="${itemTypeDto.value.refundedAmount}"></p>
           </span>
         </span>
-        </td>
+      </td>
       <td>
 
       </td>
@@ -91,11 +83,11 @@
 
 
     </tr>
-<!--    <span th:each="category : ${categoryList}">-->
-<!--      <tr th:each="itemDto: ${category.value.itemDtoMap}">-->
-<!--        <td  th:text="${itemDto.value.itemName}"></td>-->
-<!--      </tr>-->
-<!--    </span>-->
+    <!--    <span th:each="category : ${categoryList}">-->
+    <!--      <tr th:each="itemDto: ${category.value.itemDtoMap}">-->
+    <!--        <td  th:text="${itemDto.value.itemName}"></td>-->
+    <!--      </tr>-->
+    <!--    </span>-->
     </tbody>
   </table>
 </div>

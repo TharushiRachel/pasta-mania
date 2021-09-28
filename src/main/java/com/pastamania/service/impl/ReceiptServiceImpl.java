@@ -121,9 +121,9 @@ public class ReceiptServiceImpl implements ReceiptService {
             c.setTime(convertedDate);
             c.add(Calendar.MILLISECOND, 1);
             String oneSecondAddedDate = sourceFormat.format(c.getTime());
-            ResponseEntity<ItemResponse> itemResponseResponseEntityUpdated = restTemplate.exchange("https://api.loyverse.com/v1.0/receipts?updated_at_min=" + oneSecondAddedDate + "&updated_at_max=" + nowAsISO + "", HttpMethod.GET, entity, ItemResponse.class);
-            if (itemResponseResponseEntityUpdated.getBody().getItems() != null) {
-                saveReceiptWithMappedValues(modelMapper, itemResponseResponseEntity, companyOp);
+            ResponseEntity<ReceiptResponse> receiptResponseResponseEntity = restTemplate.exchange(configProperties.getLoyvers().getBaseUrl()+"receipts?created_at_min=" + oneSecondAddedDate + "&created_at_max=" + nowAsISO + "", HttpMethod.GET, entity, ReceiptResponse.class);
+            if (receiptResponseResponseEntity.getBody().getReceipts()!= null) {
+                saveReceiptWithMappedValues(modelMapper, receiptResponseResponseEntity, companyOp);
             }
         }
 

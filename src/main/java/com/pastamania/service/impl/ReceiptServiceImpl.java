@@ -108,7 +108,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             val = sourceFormat.format(c.getTime());
 
         }
-        ResponseEntity<ReceiptResponse> itemResponseResponseEntity = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl() + "receipts?created_at_min=2021-05-01T00:00:00.962Z&created_at_max=" + val + "&limit=250", HttpMethod.GET, entity, ReceiptResponse.class);
+        ResponseEntity<ReceiptResponse> itemResponseResponseEntity = restApiClient.getRestTemplate().exchange(configProperties.getLoyvers().getBaseUrl() + "receipts?created_at_min=2021-09-01T00:00:00.962Z&created_at_max=" + val + "&limit=250", HttpMethod.GET, entity, ReceiptResponse.class);
         Company companyOp = companyRepository.findById(company.getId()).get();
         saveReceiptWithMappedValues(modelMapper, itemResponseResponseEntity, companyOp);
 
@@ -119,7 +119,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             Date convertedDate = sourceFormat.parse(updatedAt);
             Calendar c = Calendar.getInstance();
             c.setTime(convertedDate);
-            c.add(Calendar.SECOND, 1);
+            c.add(Calendar.MILLISECOND, 1);
             String oneSecondAddedDate = sourceFormat.format(c.getTime());
             ResponseEntity<ItemResponse> itemResponseResponseEntityUpdated = restTemplate.exchange("https://api.loyverse.com/v1.0/receipts?updated_at_min=" + oneSecondAddedDate + "&updated_at_max=" + nowAsISO + "", HttpMethod.GET, entity, ItemResponse.class);
             if (itemResponseResponseEntityUpdated.getBody().getItems() != null) {

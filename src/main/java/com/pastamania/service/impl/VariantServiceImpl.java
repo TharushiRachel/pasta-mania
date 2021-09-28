@@ -81,7 +81,7 @@ public class VariantServiceImpl implements VariantService {
                 Date convertedDate = sourceFormat.parse(updatedAt);
                 Calendar c = Calendar.getInstance();
                 c.setTime(convertedDate);
-                c.add(Calendar.SECOND, 1);
+                c.add(Calendar.MILLISECOND, 1);
                 String oneSecondAddedDate = sourceFormat.format(c.getTime());
                 ResponseEntity<CategoryResponse> updatedResponse = restTemplate.exchange("https://api.loyverse.com/v1.0/variants?created_at_min=" + oneSecondAddedDate + "&created_at_max=" + nowAsISO + "", HttpMethod.GET, entity, CategoryResponse.class);
 

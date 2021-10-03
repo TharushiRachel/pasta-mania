@@ -28,7 +28,6 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +56,12 @@ public class DataSync {
     @Value("${shangrilaSync.pOSInterfaceCode}")
     private String pOSInterfaceCode;
 
+    @Value("#{${shangrilaSync.storeIds}}")
+    private List<String> storeIds;
+
+    @Value("${app.timeZoneId}")
+    private String timeZoneId;
+
     @Value("${shangrilaSync.url}")
     private String url;
 
@@ -80,7 +85,7 @@ public class DataSync {
 
         log.info("SyncSalesData started => {}" , LocalDateTime.now());
 
-        List<Receipt> pendingReceipts = receiptService.getPendingSyncReceipts();
+        List<Receipt> pendingReceipts = receiptService.getPendingSyncReceipts(storeIds);
         if (!pendingReceipts.isEmpty()) {
             receiptService.updateSyncStatus(SyncStatus.STARTED, 0, pendingReceipts);
 
@@ -159,7 +164,7 @@ public class DataSync {
             salesData.setPOSInterfaceCode(pOSInterfaceCode);
             if (receipt.getReceiptDate() != null && !receipt.getReceiptDate().isEmpty()) {
                 Instant instant = Instant.parse(receipt.getReceiptDate());
-                LocalDateTime receiptDateTime = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+                LocalDateTime receiptDateTime = LocalDateTime.ofInstant(instant, ZoneId.of(timeZoneId));
                 salesData.setReceiptDate(receiptDateTime.toLocalDate().format(DateTimeFormatter.ofPattern(RECEIPT_DATE_FORMAT)));
                 salesData.setReceiptTime(receiptDateTime.toLocalTime().toString());
             }

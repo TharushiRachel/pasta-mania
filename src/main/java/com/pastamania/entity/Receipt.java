@@ -84,10 +84,6 @@ public class Receipt extends CreateModifyBaseEntity {
     @Column(columnDefinition = "int not null default 0")
     private Integer errorCount = 0;
 
-    @ManyToOne
-    @JoinColumn(name = "api_log_id")
-    private ApiLog apiLog;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;

@@ -27,7 +27,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
 
     List<Receipt> findAllBySyncStatus(SyncStatus syncStatus);
 
-    List<Receipt> findAllBySyncStatusInAndErrorCountLessThanEqual(List<SyncStatus> statuses, Integer errorCount);
+    List<Receipt> findAllByStoreIdInAndSyncStatusInAndErrorCountLessThanEqual(List<String> storeIds, List<SyncStatus> statuses, Integer errorCount);
 
     @Modifying
     @Query("UPDATE Receipt r SET r.syncStatus = :syncStatus, r.errorCount = :errorCount "

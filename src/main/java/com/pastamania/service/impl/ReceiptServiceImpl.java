@@ -220,9 +220,9 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<Receipt> getPendingSyncReceipts() {
-        List<Receipt> pendingReceipts = receiptRepository.findAllBySyncStatusInAndErrorCountLessThanEqual(
-                Arrays.asList(SyncStatus.PENDING, SyncStatus.FAILED), 3);
+    public List<Receipt> getPendingSyncReceipts(List<String> storeIds) {
+        List<Receipt> pendingReceipts = receiptRepository.findAllByStoreIdInAndSyncStatusInAndErrorCountLessThanEqual(
+                storeIds, Arrays.asList(SyncStatus.PENDING, SyncStatus.FAILED), 3);
         for (Receipt receipt : pendingReceipts) {
             receipt.getPayments().size();
             receipt.getReceiptLineItems().size();
@@ -235,7 +235,8 @@ public class ReceiptServiceImpl implements ReceiptService {
     @Transactional
     @Override
     public void updateSyncStatus(SyncStatus syncStatus, Integer errorCount, List<Receipt> receipts) {
-        receiptRepository.updateReceiptSyncStatus(syncStatus, errorCount, receipts.stream().map(Receipt::getReceiptNo).collect(Collectors.toList()));
+        receiptRepository.updateReceiptSyncStatus(syncStatus, errorCount,
+                receipts.stream().map(Receipt::getReceiptNo).collect(Collectors.toList()));
     }
 
     @Transactional

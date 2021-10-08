@@ -17,7 +17,7 @@ public interface ReceiptService {
 
     List<Receipt> searchBySyncStatus(SyncStatus syncStatus);
 
-    List<Receipt> getPendingSyncReceipts();
+    List<Receipt> getPendingSyncReceipts(List<String> storeIds);
 
     void updateSyncStatus(SyncStatus syncStatus, Integer errorCount, List<Receipt> receipts);
 

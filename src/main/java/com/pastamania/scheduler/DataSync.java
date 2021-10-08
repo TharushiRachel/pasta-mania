@@ -24,10 +24,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +39,7 @@ public class DataSync {
 
     private static final String BATCH_CODE_FORMAT = "yyyyMMddHHssmm";
     private static final String RECEIPT_DATE_FORMAT = "dd/MM/uuuu";
+    private static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
 
     @Value("${shangrilaSync.appCode}")
     private String appCode;
@@ -55,8 +56,20 @@ public class DataSync {
     @Value("${shangrilaSync.pOSInterfaceCode}")
     private String pOSInterfaceCode;
 
+    @Value("#{${shangrilaSync.storeIds}}")
+    private List<String> storeIds;
+
+    @Value("${app.timeZoneId}")
+    private String timeZoneId;
+
     @Value("${shangrilaSync.url}")
     private String url;
+
+    @Value("${vat}")
+    private BigDecimal vat;
+
+    @Value("${nbt}")
+    private BigDecimal nbt;
 
     @Autowired
     private WebClient webClient;
@@ -67,13 +80,14 @@ public class DataSync {
     @Autowired
     private ApiLogService apiLogService;
 
-   // @Scheduled(fixedRate = 300000)
+    @Scheduled(cron = "${shangrilaSync.executionInterval}")
     public void syncPosTransactionSalesData() {
 
         log.info("SyncSalesData started => {}" , LocalDateTime.now());
 
-        List<Receipt> pendingReceipts = receiptService.getPendingSyncReceipts();
+        List<Receipt> pendingReceipts = receiptService.getPendingSyncReceipts(storeIds);
         if (!pendingReceipts.isEmpty()) {
+            receiptService.updateSyncStatus(SyncStatus.STARTED, 0, pendingReceipts);
 
             LocalDateTime callingDateTime = LocalDateTime.now();
             SalesDataSendRequest request = createRequest(getSalesData(pendingReceipts), callingDateTime);
@@ -150,7 +164,7 @@ public class DataSync {
             salesData.setPOSInterfaceCode(pOSInterfaceCode);
             if (receipt.getReceiptDate() != null && !receipt.getReceiptDate().isEmpty()) {
                 Instant instant = Instant.parse(receipt.getReceiptDate());
-                LocalDateTime receiptDateTime = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
+                LocalDateTime receiptDateTime = LocalDateTime.ofInstant(instant, ZoneId.of(timeZoneId));
                 salesData.setReceiptDate(receiptDateTime.toLocalDate().format(DateTimeFormatter.ofPattern(RECEIPT_DATE_FORMAT)));
                 salesData.setReceiptTime(receiptDateTime.toLocalTime().toString());
             }
@@ -160,14 +174,26 @@ public class DataSync {
             } else {
                 salesData.setNoOfItems(0);
             }
+
             salesData.setSalesCurrency(Currency.LKR.getValue());
-            salesData.setTotalSalesAmtB4Tax(receipt.getTotalMoney().subtract(receipt.getTotalTax()));
-            salesData.setTotalSalesAmtAfterTax(receipt.getTotalMoney());
+
+            if (receipt.getTotalMoney().compareTo(BigDecimal.ZERO) != 0) {
+                // Total deduction(Tax - Discount)
+                BigDecimal remainingAmount = receipt.getTotalMoney().subtract(receipt.getTotalTax()).subtract(receipt.getTotalDiscount());
+                // VAT calculation
+                BigDecimal vatAmount = remainingAmount.multiply(vat).divide(vat.add(ONE_HUNDRED), 2, RoundingMode.HALF_UP);
+                BigDecimal remainingAmountAfterTax = remainingAmount.subtract(vatAmount);
+                salesData.setTotalSalesAmtB4Tax(remainingAmountAfterTax);
+                salesData.setTotalSalesAmtAfterTax(receipt.getTotalMoney());
+            } else {
+                salesData.setTotalSalesAmtB4Tax(BigDecimal.ZERO);
+                salesData.setTotalSalesAmtAfterTax(BigDecimal.ZERO);
+            }
+
             // Tax and Service charge calculation
             if (receipt.getTotalTaxes() != null && !receipt.getTotalTaxes().isEmpty()) {
-                salesData.setSalesTaxRate(receipt.getTotalTaxes().stream()
-                        .map(ReceiptTotalTax::getRate)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add));
+                // Only VAT is considered as a tax.
+                salesData.setSalesTaxRate(vat.add(nbt));
                 salesData.setServiceChargeAmt(receipt.getTotalTaxes().stream()
                         .filter(tax -> tax.getName().equalsIgnoreCase(TaxType.SERVICE_CHARGE.getLabel()))
                         .map(ReceiptTotalTax::getMoneyAmount)

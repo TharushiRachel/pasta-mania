@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Home page</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    tr.spaceUnder>td {
+      padding-bottom: 1em;
+    }
+  </style>
+</head>
+<body>
+<p>
+  <span>Sales Summary Report</span>
+</p>
+
+<div>
+  <table id="dataForSaleSummaryReportDiningTypeDto" style="width:100%" >
+    <thead>
+    <tr>
+      <th> Category </th>
+      <th> QTY </th>
+      <th> Gross Sale </th>
+      <th> Voids/Refunds </th>
+      <th> Discounts </th>
+      <th> GrossTotal </th>
+      <th> Tax </th>
+      <th> Service Charge </th>
+      <th> Net total </th>
+      <th> Sales </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="instance : ${dataForSaleSummaryReportDiningTypeDto}">
+      <td th:text="${instance.category}"></td>
+      <td th:text="${instance.quantity}"></td>
+      <td th:text="${instance.grossSale}"></td>
+      <td th:text="${instance.refunds}"></td>
+      <td th:text="${instance.totalDiscount}"></td>
+      <td th:text="${instance.grossTotal}"></td>
+      <td th:text="${instance.tax}"></td>
+      <td th:text="${instance.serviceCharge}"></td>
+      <td th:text="${instance.netTotal}"></td>
+      <td></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+<p th:utext="${'&lt;br /&gt;'}" ></p>
+<div>
+  <table id="dataForSaleSummaryReportCategoryDto" style="width:100%" >
+    <thead>
+    <tr>
+      <th> Category </th>
+      <th> QTY </th>
+      <th> Gross Sale </th>
+      <th> Voids/Refunds </th>
+      <th> Discounts </th>
+      <th> GrossTotal </th>
+      <th> Tax </th>
+      <th> Service Charge </th>
+      <th> Net total </th>
+      <th> Sales </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="instance : ${dataForSaleSummaryReportCategoryDto}">
+      <td th:text="${instance.category}"></td>
+      <td th:text="${instance.quantity}"></td>
+      <td th:text="${instance.grossSale}"></td>
+      <td th:text="${instance.refunds}"></td>
+      <td th:text="${instance.totalDiscount}"></td>
+      <td th:text="${instance.grossTotal}"></td>
+      <td th:text="${instance.tax}"></td>
+      <td th:text="${instance.serviceCharge}"></td>
+      <td th:text="${instance.netTotal}"></td>
+      <td></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+<p th:utext="${'&lt;br /&gt;'}" ></p>
+<div>
+  <table id="dataForSaleSummaryReportPaymentModeDto" style="width:100%" >
+    <thead>
+    <tr>
+      <th> Category </th>
+      <th> QTY </th>
+      <th> Gross Sale </th>
+      <th> Voids/Refunds </th>
+      <th> Discounts </th>
+      <th> GrossTotal </th>
+      <th> Tax </th>
+      <th> Service Charge </th>
+      <th> Net total </th>
+      <th> Sales </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="instance : ${dataForSaleSummaryReportPaymentModeDto}">
+      <td th:text="${instance.category}"></td>
+      <td th:text="${instance.quantity}"></td>
+      <td th:text="${instance.grossSale}"></td>
+      <td th:text="${instance.refunds}"></td>
+      <td th:text="${instance.totalDiscount}"></td>
+      <td th:text="${instance.grossTotal}"></td>
+      <td th:text="${instance.tax}"></td>
+      <td th:text="${instance.serviceCharge}"></td>
+      <td th:text="${instance.netTotal}"></td>
+      <td></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

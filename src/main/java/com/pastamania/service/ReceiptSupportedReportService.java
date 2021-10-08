@@ -8,4 +8,10 @@ public interface ReceiptSupportedReportService {
     String parseThymeleafTemplateForDailySaleReport();
 
     String parseThymeleafTemplateForDailySaleMixReport();
+
+    String parseThymeleafTemplateForSalesSummaryReport();
+
+    String parseThymeleafTemplateForHourlySaleReport();
+
+
 }

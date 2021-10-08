@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Home page</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    tr.spaceUnder>td {
+      padding-bottom: 1em;
+    }
+  </style>
+</head>
+<body>
+<p>
+  <span>Sales Summary Report</span>
+</p>
+
+<div>
+  <table id="hourlySaleMap" style="width:100%" >
+    <thead>
+    <tr>
+      <th>----- </th>
+      <th> Transactions </th>
+      <th> Items </th>
+      <th> Avg.Sales </th>
+      <th> Sales </th>
+      <th> %Sale </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="instance : ${hourlySaleMap}">
+      <td>
+        <span th:if="${instance.key == 3}">03:00 AM - 03:59 AM</span>
+        <span th:if="${instance.key == 4}">04:00 AM - 04:59 AM</span>
+        <span th:if="${instance.key == 5}">05:00 AM - 05:59 AM</span>
+        <span th:if="${instance.key == 6}">06:00 AM - 06:59 AM</span>
+        <span th:if="${instance.key == 7}">07:00 AM - 07:59 AM</span>
+        <span th:if="${instance.key == 8}">08:00 AM - 08:59 AM</span>
+        <span th:if="${instance.key == 9}">09:00 AM - 09:59 AM</span>
+        <span th:if="${instance.key == 10}">10:00 AM -10:59 AM</span>
+        <span th:if="${instance.key == 11}">11:00 AM - 11:59 AM</span>
+        <span th:if="${instance.key == 12}">12:00 AM - 12:59 PM</span>
+        <span th:if="${instance.key == 13}">01:00 AM - 01:59 PM</span>
+        <span th:if="${instance.key == 14}">02:00 AM - 02:59 PM</span>
+        <span th:if="${instance.key == 15}">03:00 AM - 03:59 PM</span>
+        <span th:if="${instance.key == 16}">04:00 AM - 04:59 PM</span>
+        <span th:if="${instance.key == 17}">05:00 AM - 05:59 PM</span>
+        <span th:if="${instance.key == 18}">06:00 AM - 06:59 PM</span>
+        <span th:if="${instance.key == 19}">07:00 AM - 07:59 PM</span>
+        <span th:if="${instance.key == 20}">08:00 AM - 08:59 PM</span>
+        <span th:if="${instance.key == 21}">09:00 AM - 09:59 PM</span>
+        <span th:if="${instance.key == 22}">10:00 AM - 10:59 PM</span>
+        <span th:if="${instance.key == 23}">11:00 AM - 11:59 PM</span>
+        <span th:if="${instance.key == 24}">12:00 AM - 12:59 AM</span>
+        <span th:if="${instance.key == 1}">01:00 AM - 01:59 AM</span>
+        <span th:if="${instance.key == 2}">02:00 AM - 02:59 AM</span>
+      </td>
+      <td th:text="${instance.value.getTransactions()}"></td>
+      <td th:text="${instance.value.getItems()}"></td>
+      <td th:text="${instance.value.getAvgSale()}"></td>
+      <td th:text="${instance.value.getSale()}"></td>
+      <td th:text="${instance.value.getPercentageSale()}"></td>
+      <td></td>
+    </tr>
+    </tbody>
+  </table>
+  </div>
+<p th:utext="${'&lt;br /&gt;'}" ></p>
+</body>
+</html>

@@ -31,6 +31,6 @@ public class LineItemLineTax extends CreateModifyBaseEntity {
 
     private BigDecimal rate;
 
-    private String moneyAmount;
+    private BigDecimal moneyAmount;
 
 }

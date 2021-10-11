@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public interface CustomerService {
 
-    void retrieveCategoryAndPersist(Date date, Company company);
+    void retrieveCustomerAndPersist(Date date, Company company);
 
     String parseThymeleafTemplate();
 

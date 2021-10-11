@@ -16,7 +16,7 @@ public class Employee extends CreateModifyBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long employeeId;
+    private Long employeeNo;
 
     private String id;
 
@@ -28,7 +28,14 @@ public class Employee extends CreateModifyBaseEntity {
 
     private Boolean isOwner;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Set<Store> stores;
+    private String createdAt;
+
+    private String updatedAt;
+
+    private String deletedAt;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
 
 }

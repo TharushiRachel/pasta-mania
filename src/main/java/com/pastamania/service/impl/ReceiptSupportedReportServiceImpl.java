@@ -5,6 +5,7 @@ import com.pastamania.modelmapper.ModelMapper;
 import com.pastamania.report.DailySalesMixReport;
 import com.pastamania.report.HourlySaleReport;
 import com.pastamania.report.SaleSummaryReport;
+import com.pastamania.report.SettlementModeWiseReport;
 import com.pastamania.repository.ReceiptRepository;
 import com.pastamania.service.ReceiptSupportedReportService;
 import lombok.extern.slf4j.Slf4j;
@@ -158,6 +159,26 @@ public class ReceiptSupportedReportServiceImpl implements ReceiptSupportedReport
         return templateEngine.process("hourly_sale_report_template", context);
 
 
+    }
+
+    @Override
+    public String parseThymeleafTemplateForSettlementModeWiseReport() {
+        List<SettlementModeWiseReport> settlementModeWiseReports = receiptRepository.findDataForSettlementModeViewReport(null, null, null);
+
+        List<SettlementModeWiseReportDto> settlementModeWiseReportDto = modelMapper.map(settlementModeWiseReports, SettlementModeWiseReportDto.class);
+
+        LinkedHashMap<String,SettlementModeWiseReportDto> settlementModeWiseReportDtoLinkedHashMap = new LinkedHashMap();
+
+        settlementModeWiseReportDto.forEach(settlementModeWiseReport->{
+
+            SettlementModeWiseReportDto reportDto = settlementModeWiseReportDtoLinkedHashMap.get(settlementModeWiseReport.getSettlement());
+
+            if(reportDto==null){
+                SettlementModeWiseReportDto modeWiseReportDto =  new SettlementModeWiseReportDto();
+
+            }
+
+        });
     }
 
     private void extracted(LinkedHashMap<Integer, HourlySaleReportDataDto> hourlySaleMap, HourlySaleReportDto hourlySale ,int no) {

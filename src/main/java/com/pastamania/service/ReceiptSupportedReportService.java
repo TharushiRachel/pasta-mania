@@ -13,5 +13,5 @@ public interface ReceiptSupportedReportService {
 
     String parseThymeleafTemplateForHourlySaleReport();
 
-
+    String parseThymeleafTemplateForSettlementModeWiseReport();
 }

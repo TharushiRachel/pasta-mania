@@ -57,7 +57,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     CustomerRepository customerRepository;
 
-    @Autowired
+  @Autowired
     private RestApiClient restApiClient;
 
     @Autowired
@@ -70,7 +70,7 @@ public class CustomerServiceImpl implements CustomerService {
     private com.pastamania.modelmapper.ModelMapper modelMapperLocal;
 
     @Override
-    public void retrieveCategoryAndPersist(Date date, Company company) {
+    public void retrieveCustomerAndPersist(Date date, Company company) {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         df.setTimeZone(tz); // get the time zone

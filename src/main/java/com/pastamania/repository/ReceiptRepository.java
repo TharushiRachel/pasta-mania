@@ -6,6 +6,7 @@ import com.pastamania.enums.SyncStatus;
 import com.pastamania.report.DailySalesMixReport;
 import com.pastamania.report.HourlySaleReport;
 import com.pastamania.report.SaleSummaryReport;
+import com.pastamania.report.SettlementModeWiseReport;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -118,6 +119,15 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
             "GROUP BY  r.created_at\n" +
             "ORDER BY r.created_at", nativeQuery = true)
     List<HourlySaleReport> findDataForHourlySaleReport(String from, String to, Integer companyID);
+
+
+
+    @Query(value = "SELECT rp.name as settlement , r._order as orderNo  , r.dining_option  as orderType , r.created_at as  createdAt , e.`name` as userName, r.total_money as sale\n" +
+            "FROM receipt r\n" +
+            "LEFT JOIN receipt_payment rp ON rp.receipt_id=r.receipt_number\n" +
+            "LEFT JOIN employee e ON e.id = r.employee_id\n" +
+            "ORDER BY rp.`name`", nativeQuery = true)
+    List<SettlementModeWiseReport>findDataForSettlementModeViewReport(String from, String to, Integer companyID);
 
 
 

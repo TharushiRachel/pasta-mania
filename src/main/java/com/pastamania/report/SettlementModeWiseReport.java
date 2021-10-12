@@ -4,7 +4,7 @@ package com.pastamania.report;
  * @author Pasindu Lakmal
  */
 public interface SettlementModeWiseReport {
-    String getISettlement();
+    String getSettlement();
 
     String getOrderNo();
 

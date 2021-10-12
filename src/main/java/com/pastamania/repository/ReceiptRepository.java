@@ -126,6 +126,8 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
             "FROM receipt r\n" +
             "LEFT JOIN receipt_payment rp ON rp.receipt_id=r.receipt_number\n" +
             "LEFT JOIN employee e ON e.id = r.employee_id\n" +
+            "WHERE r.created_at BETWEEN '2021-09-11T00:00:00.000Z'\n" +
+            "AND '2021-09-12T00:00:00.000Z' \n" +
             "ORDER BY rp.`name`", nativeQuery = true)
     List<SettlementModeWiseReport>findDataForSettlementModeViewReport(String from, String to, Integer companyID);
 

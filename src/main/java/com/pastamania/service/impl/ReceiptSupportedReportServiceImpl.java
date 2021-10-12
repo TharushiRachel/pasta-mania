@@ -17,10 +17,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Pasindu Lakmal
@@ -167,18 +164,48 @@ public class ReceiptSupportedReportServiceImpl implements ReceiptSupportedReport
 
         List<SettlementModeWiseReportDto> settlementModeWiseReportDto = modelMapper.map(settlementModeWiseReports, SettlementModeWiseReportDto.class);
 
-        LinkedHashMap<String,SettlementModeWiseReportDto> settlementModeWiseReportDtoLinkedHashMap = new LinkedHashMap();
+        LinkedHashMap<String,List<SettlementModeWiseReportDto>> settlementModeWiseReportDtoLinkedHashMap = new LinkedHashMap();
 
         settlementModeWiseReportDto.forEach(settlementModeWiseReport->{
 
-            SettlementModeWiseReportDto reportDto = settlementModeWiseReportDtoLinkedHashMap.get(settlementModeWiseReport.getSettlement());
+            List<SettlementModeWiseReportDto> settlementModeWiseReportDtos = settlementModeWiseReportDtoLinkedHashMap.get(settlementModeWiseReport.getSettlement());
 
-            if(reportDto==null){
+            if(settlementModeWiseReportDtos==null){
                 SettlementModeWiseReportDto modeWiseReportDto =  new SettlementModeWiseReportDto();
+                ArrayList<SettlementModeWiseReportDto>  settlementModeWiseReportDtoArrayList = new ArrayList();
+
+                modeWiseReportDto.setSettlement(settlementModeWiseReport.getSettlement());
+                modeWiseReportDto.setOrderNo(settlementModeWiseReport.getOrderNo());
+                modeWiseReportDto.setOrderType(settlementModeWiseReport.getOrderType());
+                modeWiseReportDto.setCreatedAt(settlementModeWiseReport.getCreatedAt());
+                modeWiseReportDto.setUserName(settlementModeWiseReport.getUserName());
+                modeWiseReportDto.setSale(settlementModeWiseReport.getSale());
+
+                settlementModeWiseReportDtoArrayList.add(modeWiseReportDto);
+                settlementModeWiseReportDtoLinkedHashMap.put(modeWiseReportDto.getSettlement(), settlementModeWiseReportDtoArrayList);
+            }
+
+            else{
+
+                SettlementModeWiseReportDto modeWiseReportDto =  new SettlementModeWiseReportDto();
+                modeWiseReportDto.setSettlement(settlementModeWiseReport.getSettlement());
+                modeWiseReportDto.setOrderNo(settlementModeWiseReport.getOrderNo());
+                modeWiseReportDto.setOrderType(settlementModeWiseReport.getOrderType());
+                modeWiseReportDto.setCreatedAt(settlementModeWiseReport.getCreatedAt());
+                modeWiseReportDto.setUserName(settlementModeWiseReport.getUserName());
+                modeWiseReportDto.setSale(settlementModeWiseReport.getSale());
+
+                settlementModeWiseReportDtos.add(modeWiseReportDto);
 
             }
 
         });
+
+        TemplateEngine templateEngine = getTemplateEngine();
+        Context context = new Context();
+        context.setVariable("settlementModeWiseReportDtoLinkedHashMap",settlementModeWiseReportDtoLinkedHashMap);
+        return templateEngine.process("settlement_mode_wise_report_template", context);
+
     }
 
     private void extracted(LinkedHashMap<Integer, HourlySaleReportDataDto> hourlySaleMap, HourlySaleReportDto hourlySale ,int no) {

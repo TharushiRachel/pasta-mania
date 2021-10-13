@@ -30,7 +30,7 @@ public class ReceiptResponse {
         @JsonProperty("refund_for")
         private String refundFor;
 
-        private String _order;
+        private String order;
 
         @JsonProperty("created_at")
         private String createdAt;

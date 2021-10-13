@@ -3,10 +3,7 @@ package com.pastamania.repository;
 import com.pastamania.entity.Company;
 import com.pastamania.entity.Receipt;
 import com.pastamania.enums.SyncStatus;
-import com.pastamania.report.DailySalesMixReport;
-import com.pastamania.report.HourlySaleReport;
-import com.pastamania.report.SaleSummaryReport;
-import com.pastamania.report.SettlementModeWiseReport;
+import com.pastamania.report.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -131,6 +128,29 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
             "ORDER BY rp.`name`", nativeQuery = true)
     List<SettlementModeWiseReport>findDataForSettlementModeViewReport(String from, String to, Integer companyID);
 
+
+
+    @Query(value = "SELECT\n" +
+            "\trp.type AS type,\n" +
+            "\tr.receipt_type AS receiptType,\n" +
+            "\tr.refund_for AS reason\n" +
+            "\tr._order AS orderNo,\n" +
+            "\tr.dining_option AS orderType,\n" +
+            "\tr.created_at AS createdAt,\n" +
+            "\te.`name` AS userName,\n" +
+            "\tr.total_money AS sale \n" +
+            "FROM\n" +
+            "\treceipt r\n" +
+            "\tLEFT JOIN receipt_payment rp ON rp.receipt_id = r.receipt_number\n" +
+            "\tLEFT JOIN employee e ON e.id = r.employee_id \n" +
+            "WHERE\n" +
+            "\tr.receipt_type = 'REFUND' \n" +
+            "\tOR r.receipt_type = 'VOID' \n" +
+            "\tAND r.created_at BETWEEN '2021-09-11T00:00:00.000Z' \n" +
+            "\tAND '2021-09-12T00:00:00.000Z' \n" +
+            "ORDER BY\n" +
+            "\trp.`name`", nativeQuery = true)
+    List<VoidRefundDetailReport> findDataForVoidRefundDetailForm(String from, String to, Integer companyID);
 
 
 

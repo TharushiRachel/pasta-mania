@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Home page</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    tr.spaceUnder>td {
+      padding-bottom: 1em;
+    }
+  </style>
+</head>
+<body>
+<p>
+  Settlement Mode Wise
+</p>
+
+<div>
+  <table id="settlementModeWiseReportDtoLinkedHashMap" style="width:100%" >
+    <thead>
+    <tr>
+      <th> Settlement Mode </th>
+      <th> Order No </th>
+      <th> Order Type </th>
+      <th> Order Time </th>
+      <th> User ID </th>
+      <th> Remarks </th>
+      <th> Sales </th>
+    </tr>
+    </thead>
+    <tbody>
+<!--    <tr th:each="instance : ${settlementModeWiseReportDtoLinkedHashMap}">-->
+<!--      <td th:text="${instance.key}"></td>-->
+<!--    </tr>-->
+    <span th:each="instance : ${settlementModeWiseReportDtoLinkedHashMap}">
+       <tr th:each="itemDto : ${instance.value}">
+              <td th:text="${instance.key}"></td>
+              <td th:text="${itemDto.orderNo}"></td>
+              <td th:text="${itemDto.orderType}"></td>
+              <td th:text="${itemDto.createdAt}"></td>
+              <td th:text="${itemDto.userName}"></td>
+              <td></td>
+              <td th:text="${itemDto.sale}"></td>
+       </tr>
+    </span>
+
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

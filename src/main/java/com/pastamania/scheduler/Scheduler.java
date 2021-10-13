@@ -1,7 +1,6 @@
 package com.pastamania.scheduler;
 
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.*;
 import com.lowagie.text.DocumentException;
 import com.pastamania.service.*;
@@ -55,6 +54,9 @@ public class Scheduler {
     @Autowired
     ReceiptSupportedReportService receiptSupportedReportService;
 
+    @Autowired
+    EmployeeService employeeService;
+
 
     public class Rotate extends PdfPageEventHelper {
 
@@ -70,26 +72,47 @@ public class Scheduler {
         }
     }
 
+//    @Scheduled(cron = "*/5 * * * * *")
+//    public void reportCurrentTime() throws IOException, DocumentException, com.itextpdf.text.DocumentException {
+//        log.info("Current time = " + dateFormat.format(new Date()));
+//
+//        if (companyService.findAll().isEmpty()) {
+//            companyService.createInitialCompanies();
+//        }
+//        companyService.findAll().stream().forEach(company -> {
+//            try {
+//                customerService.retrieveCustomerAndPersist(new Date(), company);
+//                categoryService.retrieveCategoryAndPersist(new Date(), company);
+//                itemService.retrieveItemAndPersist(new Date(), company);
+//                receiptService.retrieveReceiptAndPersist(new Date(), company);
+//                employeeService.retrieveEmployeeAndPersist(new Date(), company);
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//
+//        });
+//        //storeService.initialStorePersist();
+//        //discountService.initialStorePersist();
+//
+//    }
+
     @Scheduled(cron = "*/5 * * * * *")
     public void reportCurrentTime() throws IOException, DocumentException, com.itextpdf.text.DocumentException {
         log.info("Current time = " + dateFormat.format(new Date()));
 
-        if (companyService.findAll().isEmpty()) {
-            companyService.createInitialCompanies();
-        }
-        companyService.findAll().stream().forEach(company -> {
-            try {
-                customerService.retrieveCategoryAndPersist(new Date(), company);
-                categoryService.retrieveCategoryAndPersist(new Date(), company);
-                itemService.retrieveItemAndPersist(new Date(), company);
-                receiptService.retrieveReceiptAndPersist(new Date(), company);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-        });
-        //storeService.initialStorePersist();
-        //discountService.initialStorePersist();
+        String template =  receiptSupportedReportService.parseThymeleafTemplateForSettlementModeWiseReport();
+        ByteArrayOutputStream byteArrayOutputStream = htmlService.generatePdfOutputStreamFromHtml(template);
+        OutputStream out = new FileOutputStream("settlement-mode-wise-report.pdf");
+//        Document document = new Document();
+//        PdfWriter writer = PdfWriter.getInstance(document, out);
+//        document.newPage();
+//        Rotate event = new Rotate();
+//        writer.setPageEvent(event);
+//        document.open();
+//        event.setOrientation(PdfPage.LANDSCAPE);
+//        document.close();
+        out.write(byteArrayOutputStream.toByteArray());
+        out.close();
 
     }
 

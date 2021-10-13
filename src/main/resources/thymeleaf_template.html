@@ -17,7 +17,7 @@
 </p>
 
 <div>
-  <table id="customerList" style="width:100%" >
+  <table id="settlementModeWiseReportDtoLinkedHashMap" style="width:100%" >
     <thead>
     <tr>
       <th> Customer Name </th>
@@ -31,9 +31,9 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="customer : ${customerList}">
-      <td th:text="${customer.name}"></td>
-      <td th:text="${customer.email}"></td>
+    <tr th:each="instance : ${settlementModeWiseReportDtoLinkedHashMap}">
+      <td th:text="${instance.key}"></td>
+      <td th:text="${instance.value.}"></td>
       <td th:text="${customer.phoneNumber}"></td>
       <td th:text="${customer.firstVisit}"></td>
       <td th:text="${customer.lastVisit}"></td>

@@ -133,6 +133,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         receiptResponseResponseEntity.getBody().getReceipts().forEach(receipt -> {
             Receipt receipt1 = modelMapper.map(receipt, Receipt.class);
             receipt1.setCompany(companyOp);
+            receipt1.set_order(receipt.getOrder());
             if (receipt1.getTotalDiscounts() != null) receipt1.getTotalDiscounts().clear();
             if (receipt1.getTotalTaxes() != null) receipt1.getTotalTaxes().clear();
             if (receipt1.getReceiptLineItems() != null) receipt1.getReceiptLineItems().clear();

@@ -10,10 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -72,48 +69,48 @@ public class Scheduler {
         }
     }
 
-//    @Scheduled(cron = "*/5 * * * * *")
-//    public void reportCurrentTime() throws IOException, DocumentException, com.itextpdf.text.DocumentException {
-//        log.info("Current time = " + dateFormat.format(new Date()));
-//
-//        if (companyService.findAll().isEmpty()) {
-//            companyService.createInitialCompanies();
-//        }
-//        companyService.findAll().stream().forEach(company -> {
-//            try {
-//                customerService.retrieveCustomerAndPersist(new Date(), company);
-//                categoryService.retrieveCategoryAndPersist(new Date(), company);
-//                itemService.retrieveItemAndPersist(new Date(), company);
-//                receiptService.retrieveReceiptAndPersist(new Date(), company);
-//                employeeService.retrieveEmployeeAndPersist(new Date(), company);
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//
-//        });
-//        //storeService.initialStorePersist();
-//        //discountService.initialStorePersist();
-//
-//    }
-
     @Scheduled(cron = "*/5 * * * * *")
     public void reportCurrentTime() throws IOException, DocumentException, com.itextpdf.text.DocumentException {
         log.info("Current time = " + dateFormat.format(new Date()));
 
-        String template =  receiptSupportedReportService.parseThymeleafTemplateForSettlementModeWiseReport();
-        ByteArrayOutputStream byteArrayOutputStream = htmlService.generatePdfOutputStreamFromHtml(template);
-        OutputStream out = new FileOutputStream("settlement-mode-wise-report.pdf");
-//        Document document = new Document();
-//        PdfWriter writer = PdfWriter.getInstance(document, out);
-//        document.newPage();
-//        Rotate event = new Rotate();
-//        writer.setPageEvent(event);
-//        document.open();
-//        event.setOrientation(PdfPage.LANDSCAPE);
-//        document.close();
-        out.write(byteArrayOutputStream.toByteArray());
-        out.close();
+        if (companyService.findAll().isEmpty()) {
+            companyService.createInitialCompanies();
+        }
+        companyService.findAll().stream().forEach(company -> {
+            try {
+                customerService.retrieveCustomerAndPersist(new Date(), company);
+                categoryService.retrieveCategoryAndPersist(new Date(), company);
+                itemService.retrieveItemAndPersist(new Date(), company);
+                receiptService.retrieveReceiptAndPersist(new Date(), company);
+                employeeService.retrieveEmployeeAndPersist(new Date(), company);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        });
+        //storeService.initialStorePersist();
+        //discountService.initialStorePersist();
 
     }
+
+//    @Scheduled(cron = "*/5 * * * * *")
+//    public void reportCurrentTime() throws IOException, DocumentException, com.itextpdf.text.DocumentException {
+//        log.info("Current time = " + dateFormat.format(new Date()));
+//
+//        String template =  receiptSupportedReportService.parseThymeleafTemplateForSettlementModeWiseReport();
+//        ByteArrayOutputStream byteArrayOutputStream = htmlService.generatePdfOutputStreamFromHtml(template);
+//        OutputStream out = new FileOutputStream("settlement-mode-wise-report.pdf");
+////        Document document = new Document();
+////        PdfWriter writer = PdfWriter.getInstance(document, out);
+////        document.newPage();
+////        Rotate event = new Rotate();
+////        writer.setPageEvent(event);
+////        document.open();
+////        event.setOrientation(PdfPage.LANDSCAPE);
+////        document.close();
+//        out.write(byteArrayOutputStream.toByteArray());
+//        out.close();
+//
+//    }
 
 }

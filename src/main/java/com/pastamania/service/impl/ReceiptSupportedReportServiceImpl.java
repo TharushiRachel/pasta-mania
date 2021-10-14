@@ -2,10 +2,7 @@ package com.pastamania.service.impl;
 
 import com.pastamania.dto.reportDto.*;
 import com.pastamania.modelmapper.ModelMapper;
-import com.pastamania.report.DailySalesMixReport;
-import com.pastamania.report.HourlySaleReport;
-import com.pastamania.report.SaleSummaryReport;
-import com.pastamania.report.SettlementModeWiseReport;
+import com.pastamania.report.*;
 import com.pastamania.repository.ReceiptRepository;
 import com.pastamania.service.ReceiptSupportedReportService;
 import lombok.extern.slf4j.Slf4j;
@@ -207,6 +204,60 @@ public class ReceiptSupportedReportServiceImpl implements ReceiptSupportedReport
         return templateEngine.process("settlement_mode_wise_report_template", context);
 
     }
+
+    @Override
+    public String parseThymeleafTemplateForVoidRefundDetailReport() {
+
+        List<VoidRefundDetailReport> voidRefundDetailReports = receiptRepository.findDataForVoidRefundDetailForm(null,null,null);
+
+        List<VoidRefundDetailReportDto> voidRefundDetailReportDto = modelMapper.map(voidRefundDetailReports, VoidRefundDetailReportDto.class);
+
+        LinkedHashMap<String,List<VoidRefundDetailReportDto>> voidRefundDetailReportDtoLinkedHashMap = new LinkedHashMap();
+
+        voidRefundDetailReportDto.forEach(voidRefundDetailReport->{
+            List<VoidRefundDetailReportDto> voidRefundDetailReportDtos = voidRefundDetailReportDtoLinkedHashMap.get(voidRefundDetailReport.getReceiptType());
+
+            if(voidRefundDetailReportDtos == null){
+                VoidRefundDetailReportDto voidRefundDetailReportDto1 =  new VoidRefundDetailReportDto();
+                ArrayList<VoidRefundDetailReportDto>  voidRefundDetailReportDtoArrayList = new ArrayList();
+
+                voidRefundDetailReportDto1.setType(voidRefundDetailReport.getType());
+                voidRefundDetailReportDto1.setReceiptType(voidRefundDetailReport.getReceiptType());
+                voidRefundDetailReportDto1.setReason(voidRefundDetailReport.getReason());
+                voidRefundDetailReportDto1.setOrderNo(voidRefundDetailReport.getOrderNo());
+                voidRefundDetailReportDto1.setCreatedAt(voidRefundDetailReport.getCreatedAt());
+                voidRefundDetailReportDto1.setUserName(voidRefundDetailReport.getUserName());
+                voidRefundDetailReportDto1.setOrderType(voidRefundDetailReport.getOrderType());
+                voidRefundDetailReportDto1.setSale(voidRefundDetailReport.getSale());
+
+                voidRefundDetailReportDtoArrayList.add(voidRefundDetailReportDto1);
+                voidRefundDetailReportDtoLinkedHashMap.put(voidRefundDetailReportDto1.getReceiptType(), voidRefundDetailReportDtoArrayList);
+            }
+
+            else{
+                VoidRefundDetailReportDto voidRefundDetailReportDto1 =  new VoidRefundDetailReportDto();
+
+                voidRefundDetailReportDto1.setType(voidRefundDetailReport.getType());
+                voidRefundDetailReportDto1.setReceiptType(voidRefundDetailReport.getReceiptType());
+                voidRefundDetailReportDto1.setReason(voidRefundDetailReport.getReason());
+                voidRefundDetailReportDto1.setOrderNo(voidRefundDetailReport.getOrderNo());
+                voidRefundDetailReportDto1.setCreatedAt(voidRefundDetailReport.getCreatedAt());
+                voidRefundDetailReportDto1.setUserName(voidRefundDetailReport.getUserName());
+                voidRefundDetailReportDto1.setOrderType(voidRefundDetailReport.getOrderType());
+                voidRefundDetailReportDto1.setSale(voidRefundDetailReport.getSale());
+
+                voidRefundDetailReportDtos.add(voidRefundDetailReportDto1);
+            }
+
+        });
+
+        TemplateEngine templateEngine = getTemplateEngine();
+        Context context = new Context();
+        context.setVariable("voidRefundDetailReportDtoLinkedHashMap",voidRefundDetailReportDtoLinkedHashMap);
+        return templateEngine.process("void_refund_detail_report_template", context);
+
+    }
+
 
     private void extracted(LinkedHashMap<Integer, HourlySaleReportDataDto> hourlySaleMap, HourlySaleReportDto hourlySale ,int no) {
         HourlySaleReportDataDto hourlySaleReportDataDto = hourlySaleMap.get(no);

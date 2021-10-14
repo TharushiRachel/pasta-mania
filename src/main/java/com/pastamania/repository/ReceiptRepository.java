@@ -133,7 +133,7 @@ public interface ReceiptRepository extends JpaRepository<Receipt, Long> {
     @Query(value = "SELECT\n" +
             "\trp.type AS type,\n" +
             "\tr.receipt_type AS receiptType,\n" +
-            "\tr.refund_for AS reason\n" +
+            "\tr.refund_for AS reason,\n" +
             "\tr._order AS orderNo,\n" +
             "\tr.dining_option AS orderType,\n" +
             "\tr.created_at AS createdAt,\n" +

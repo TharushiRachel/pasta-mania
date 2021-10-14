@@ -17,4 +17,6 @@ public interface VoidRefundDetailReport {
     String getUserName();
 
     Double getSale();
+
+    String getOrderType();
 }
